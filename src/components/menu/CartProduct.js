@@ -26,7 +26,7 @@ export default function CartProduct({product,onRemove}) {
         )}
       </div>
       <div className="text-lg font-semibold">
-        ${cartProductPrice(product)}
+      €{cartProductPrice(product)}
       </div>
       
         
