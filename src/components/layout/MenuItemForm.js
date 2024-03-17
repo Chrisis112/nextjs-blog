@@ -10,6 +10,7 @@ export default function MenuItemForm({onSubmit,menuItem}) {
   const [description, setDescription] = useState(menuItem?.description || '');
   const [basePrice, setBasePrice] = useState(menuItem?.basePrice || '');
   const [sizes, setSizes] = useState(menuItem?.sizes || []);
+  const [temperature, setTemperature] = useState(menuItem?.temperature || [])
   const [category, setCategory] = useState(menuItem?.category || '');
   const [categories, setCategories] = useState([]);
   const [
@@ -29,7 +30,7 @@ export default function MenuItemForm({onSubmit,menuItem}) {
     <form
       onSubmit={ev =>
         onSubmit(ev, {
-          image,name,description,basePrice,sizes,extraIngredientPrices,category,
+          image,name,description,basePrice,sizes,extraIngredientPrices,category,temperature
         })
       }
       className="mt-8 max-w-2xl mx-auto">
@@ -68,6 +69,10 @@ export default function MenuItemForm({onSubmit,menuItem}) {
                               addLabel={'Add item size'}
                               props={sizes}
                               setProps={setSizes} />
+          <MenuItemPriceProps name={'Temperature'}
+                              addLabel={'Add item temperature'}
+                              props={temperature}
+                              setProps={setTemperature} />
           <MenuItemPriceProps name={'Extra ingredients'}
                               addLabel={'Add ingredients prices'}
                               props={extraIngredientPrices}

@@ -13,7 +13,7 @@ export default function UserForm({user,onSave}) {
   const [city, setCity] = useState(user?.city || '');
   const [country, setCountry] = useState(user?.country || '');
   const [admin, setAdmin] = useState(user?.admin || false);
-  const [seller, setSeller] = useState(user?.admin || false);
+  const [seller, setSeller] = useState(user?.seller || false);
   const {data:loggedInUserData} = useProfile();
 
   function handleAddressChange(propName, value) {

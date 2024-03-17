@@ -104,11 +104,17 @@ export default function CartPage() {
                   Size: <span>{product.size.name}</span>
                 </div>
               )}
+               {product.temperature && (
+                <div className="text-sm">
+                  Temperature: <span>{product.temperature.name}</span>
+                </div>
+              )}
               {product.extras?.length > 0 && (
                 <div className="text-sm text-gray-500">
                   {product.extras.map(extra => (
                     <div key={extra.name}>{extra.name} €{extra.price}</div>
                   ))}
+                  
                 </div>
               )}
             </div>

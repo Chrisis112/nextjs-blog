@@ -14,7 +14,13 @@ export function cartProductPrice(cartProduct) {
     for (const extra of cartProduct.extras) {
       price += extra.price;
     }
+    if (cartProduct.temperature?.length > 0) {
+      for (const temperature of cartProduct.temperature) {
+        price += temperature.price;
+      }
   }
+}
+  
   return price;
 }
 
@@ -50,9 +56,9 @@ export function AppProvider({children}) {
     }
   }
 
-  function addToCart(product, size=null, extras=[]) {
+  function addToCart(product, size=null, extras=[], temperature=[]) {
     setCartProducts(prevProducts => {
-      const cartProduct = {...product, size, extras};
+      const cartProduct = {...product, size, temperature, extras};
       const newProducts = [...prevProducts, cartProduct];
       saveCartProductsToLocalStorage(newProducts);
       return newProducts;

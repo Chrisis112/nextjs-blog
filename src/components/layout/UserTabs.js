@@ -12,7 +12,7 @@ export default function UserTabs({isAdmin, isSeller})  {
       >
         Profile
       </Link>
-      {isAdmin && (
+      {isAdmin &&  (
         <>
           <Link
             href={'/categories'}
@@ -31,16 +31,27 @@ export default function UserTabs({isAdmin, isSeller})  {
             href={'/users'}
           >
             Users
-          </Link>
-        </>
-      )}
-      <Link
+          </Link> 
+          <Link
         className={path === '/orders' ? 'active' : ''}
         href={'/orders'}
       >
         Orders
-      </Link>
-
+         </Link>
+        </>
+        
+    )}
+    {isSeller &&  (
+             <>
+          <Link
+        className={path === '/orders' ? 'active' : ''}
+        href={'/orders'}
+      >
+        Orders
+         </Link>
+         </>
+          )}
+     
     </div>
   );
 }

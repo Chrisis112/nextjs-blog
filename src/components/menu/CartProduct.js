@@ -17,10 +17,15 @@ export default function CartProduct({product,onRemove}) {
             Size: <span>{product.size.name}</span>
           </div>
         )}
+        {product.temp && (
+          <div className="text-sm">
+            Size: <span>{product.temp.name}</span>
+          </div>
+        )}
         {product.extras?.length > 0 && (
           <div className="text-sm text-gray-500">
             {product.extras.map(extra => (
-              <div key={extra.name}>{extra.name} ${extra.price}</div>
+              <div key={extra.name}>{extra.name} €{extra.price}</div>
             ))}
           </div>
         )}

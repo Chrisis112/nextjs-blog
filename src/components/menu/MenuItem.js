@@ -6,23 +6,26 @@ import {useContext, useState} from "react";
 export default function MenuItem(menuItem) {
   const {
     image,name,description,basePrice,
-    sizes, extraIngredientPrices,
+    sizes, extraIngredientPrices, temperature
   } = menuItem;
   const [
     selectedSize, setSelectedSize
-  ] = useState(sizes?.[0] || null);
+  ] = useState(temperature?.[0] || null);
+  const [
+    selectedTemperature, setSelectedTemperature
+  ] = useState([]);
   const [selectedExtras, setSelectedExtras] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const {addToCart} = useContext(CartContext);
 
   async function handleAddToCartButtonClick() {
     console.log('add to cart');
-    const hasOptions = sizes.length > 0 || extraIngredientPrices.length > 0;
+    const hasOptions = sizes.length > 0 || temperature.length > 0 || extraIngredientPrices.length > 0;
     if (hasOptions && !showPopup) {
       setShowPopup(true);
       return;
     }
-    addToCart(menuItem, selectedSize, selectedExtras);
+    addToCart(menuItem, selectedSize, selectedExtras, selectedTemperature);
     await new Promise(resolve => setTimeout(resolve, 1000));
     console.log('hiding popup');
     setShowPopup(false);
@@ -37,6 +40,16 @@ export default function MenuItem(menuItem) {
       });
     }
   }
+  function handleTemperature(ev, extraTemp) {
+    const checked2 = ev.target.checked;
+    if (checked2) {
+      setSelectedTemperature(prev => [...prev, extraTemp]);
+    } else {
+      setSelectedTemperature(prev => {
+        return prev.filter(e => e.name !== extraTemp.name);
+      });
+    }
+  }
 
   let selectedPrice = basePrice;
   if (selectedSize) {
@@ -45,6 +58,10 @@ export default function MenuItem(menuItem) {
   if (selectedExtras?.length > 0) {
     for (const extra of selectedExtras) {
       selectedPrice += extra.price;
+    }
+  }if (selectedTemperature?.length > 0) {
+    for (const temp of selectedTemperature) {
+      selectedPrice += temp.price;
     }
   }
 
@@ -63,7 +80,7 @@ export default function MenuItem(menuItem) {
               <Image
                 src={image}
                 alt={name}
-                width={300} height={200}
+                width={220} height={300}
                 className="mx-auto" />
               <h2 className="text-lg font-bold text-center mb-2">{name}</h2>
               <p className="text-center text-gray-500 text-sm mb-2">
@@ -82,6 +99,23 @@ export default function MenuItem(menuItem) {
                         checked={selectedSize?.name === size.name}
                         name="size"/>
                       {size.name} €{basePrice + size.price}
+                    </label>
+                  ))}
+                </div>
+              )}
+              {temperature?.length > 0 && (
+                <div className="py-2">
+                  <h3 className="text-center text-gray-700">Sellect temperature</h3>
+                  {temperature.map(temperature => (
+                    <label
+                      key={temperature._id}
+                      className="flex items-center gap-2 p-4 border rounded-md mb-1">
+                      <input
+                        type="radio"
+                        onChange={() => setSelectedTemperature(temperature)}
+                        checked={selectedTemperature.name === temperature.name}
+                        name="temperature" />
+                      {temperature.name} €{temperature.price} 
                     </label>
                   ))}
                 </div>

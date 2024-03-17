@@ -27,7 +27,7 @@ export default function OrdersPage() {
 
   return (
     <section className="mt-8 max-w-2xl mx-auto">
-      <UserTabs isAdmin={profile.admin} />
+      <UserTabs isSeller ={profile.seller} isAdmin={profile.admin} />
       <div className="mt-8">
         {loadingOrders && (
           <div>Loading orders...</div>

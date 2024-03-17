@@ -69,6 +69,20 @@ export async function isAdmin() {
       return false;
     }
     return userInfo.admin;
+    
+  }
+  export async function isSeller() {
+    const session = await getServerSession(authOptions);
+    const userEmail = session?.user?.email;
+    if (!userEmail) {
+      return false;
+    }
+    const userInfo = await UserInfo.findOne({email:userEmail});
+    if (!userInfo) {
+      return false;
+    }
+    return userInfo.seller;
+    
   }
 const handler = NextAuth(authOptions);
 

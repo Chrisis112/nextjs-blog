@@ -5,6 +5,7 @@ const ExtraPriceSchema = new Schema({
   price: Number,
 });
 
+
 const MenuItemSchema = new Schema({
   image: {type: String},
   name: {type: String},
@@ -12,6 +13,7 @@ const MenuItemSchema = new Schema({
   category: {type: mongoose.Types.ObjectId},
   basePrice: {type: Number},
   sizes: {type:[ExtraPriceSchema]},
+  temperature: {type:[ExtraPriceSchema]},
   extraIngredientPrices: {type:[ExtraPriceSchema]},
 }, {timestamps: true});
 
