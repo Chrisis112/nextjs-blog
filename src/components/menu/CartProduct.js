@@ -17,9 +17,9 @@ export default function CartProduct({product,onRemove}) {
             Size: <span>{product.size.name}</span>
           </div>
         )}
-        {product.temp && (
+        {product.temperature && (
           <div className="text-sm">
-            Size: <span>{product.temp.name}</span>
+            Temperature: <span>{product.temperature.name}</span>
           </div>
         )}
         {product.extras?.length > 0 && (

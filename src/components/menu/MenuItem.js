@@ -10,10 +10,10 @@ export default function MenuItem(menuItem) {
   } = menuItem;
   const [
     selectedSize, setSelectedSize
-  ] = useState(temperature?.[0] || null);
+  ] = useState(sizes?.[0] || null);
   const [
     selectedTemperature, setSelectedTemperature
-  ] = useState([]);
+  ] = useState(temperature?.[0] || null);
   const [selectedExtras, setSelectedExtras] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const {addToCart} = useContext(CartContext);
@@ -75,13 +75,13 @@ export default function MenuItem(menuItem) {
             onClick={ev => ev.stopPropagation()}
             className="my-8 bg-white p-2 rounded-lg max-w-md">
             <div
-              className="overflow-y-scroll p-2"
+              className="overflow-y-scroll p-2 items-center"
               style={{maxHeight:'calc(100vh - 100px)'}}>
               <Image
                 src={image}
                 alt={name}
                 width={220} height={300}
-                className="mx-auto" />
+                className="flex items-center text-center  p-2" />
               <h2 className="text-lg font-bold text-center mb-2">{name}</h2>
               <p className="text-center text-gray-500 text-sm mb-2">
                 {description}
@@ -115,7 +115,7 @@ export default function MenuItem(menuItem) {
                         onChange={() => setSelectedTemperature(temperature)}
                         checked={selectedTemperature.name === temperature.name}
                         name="temperature" />
-                      {temperature.name} €{temperature.price} 
+                      {temperature.name} {temperature.price} 
                     </label>
                   ))}
                 </div>
