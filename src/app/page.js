@@ -3,6 +3,7 @@ import Hero from "@/components/layout/Hero";
 import HomeMenu from "@/components/layout/HomeMenu";
 import SectionHeaders from "@/components/layout/SectionHeaders";
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from "@vercel/analytics/react"
 
 
 export default function Home() {
@@ -10,6 +11,7 @@ export default function Home() {
   return (
     <>
     <SpeedInsights/>
+    <Analytics/>
       <Hero />
       <HomeMenu />
       <section className="text-center my-16" id="about">
