@@ -7,6 +7,7 @@ const stripe = require('stripe')(process.env.STRIPE_SK);
 
 export async function POST(req) {
   mongoose.connect(process.env.MONGO_URL);
+  console.log (req.headers)
 
   const {cartProducts, address} = await req.json();
   const session = await getServerSession(authOptions);
