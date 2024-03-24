@@ -5,10 +5,7 @@ import "./TrendingSlider.css";
 const TrendingSlider = () => {
   
   return (
-    <>
-    <div className="firstContainer">
-       <span><img className="firstImage" src="https://i.imgur.com/DL8lA2O.png"></img></span>
-       </div>
+    <> <div className=" mx-auto">
     <div className="wrapper">
     <div className="track">   
       <span><img style={{minWidth: "500px"
@@ -20,6 +17,7 @@ const TrendingSlider = () => {
       <span><img style={{
         minWidth: "500px"}}  id= "backBtn"src="https://i.imgur.com/j58q4JM.png"></img></span>
     </div>
+              </div>
               </div>
     </>
 );

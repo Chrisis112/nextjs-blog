@@ -13,6 +13,7 @@ export default function Home() {
     <>
     <SpeedInsights/>
     <Analytics/>
+    <img className="max-h-auto max-h-25 block mx-auto" src="https://i.imgur.com/DL8lA2O.png"></img>
    <TrendingSlider/>
       <Hero />
       
