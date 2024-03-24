@@ -31,7 +31,7 @@
 .wrapper .track {
 	display: flex;
 	width: calc(150px * 10);
-	animation: scroll 30s 0.5s linear infinite;
+	animation: scroll 10s 0.5s linear infinite;
 }
 
 .wrapper .logo {
@@ -51,11 +51,9 @@
 .firstContainer {
  
 	height: 100%;
-	overflow: hidden;
-	position: relative;
+	
 	width: 100%;
-	display: flex;
-	align-items: center;
+	
 	padding: 0 20px;
 }
 @keyframes  scroll {
