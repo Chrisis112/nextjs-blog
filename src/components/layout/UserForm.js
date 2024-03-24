@@ -2,7 +2,8 @@
 import AddressInputs from "@/components/layout/AddressInputs";
 import EditableImage from "@/components/layout/EditableImage";
 import {useProfile} from "@/components/UseProfile";
-import {useState} from "react";
+import {useState, useEffect} from "react";
+
 
 export default function UserForm({user,onSave}) {
   const [userName, setUserName] = useState(user?.name || '');
@@ -15,6 +16,7 @@ export default function UserForm({user,onSave}) {
   const [admin, setAdmin] = useState(user?.admin || false);
   const [seller, setSeller] = useState(user?.seller || false);
   const {data:loggedInUserData} = useProfile();
+ 
 
   function handleAddressChange(propName, value) {
     if (propName === 'phone') setPhone(value);
@@ -23,8 +25,9 @@ export default function UserForm({user,onSave}) {
     if (propName === 'city') setCity(value);
     if (propName === 'country') setCountry(value);
   }
-
+  
   return (
+    
     <div className="md:flex gap-4">
       <div>
         <div className="p-2 rounded-lg relative max-w-[120px]">
@@ -52,6 +55,9 @@ export default function UserForm({user,onSave}) {
           addressProps={{phone, streetAddress, postalCode, city, country}}
           setAddressProp={handleAddressChange}
         />
+        <span>
+            Your bonus points: {loggedInUserData?.bonus}
+            </span>
         {loggedInUserData.admin && (
           <div>
             <label className="p-2 inline-flex items-center gap-2 mb-2" htmlFor="adminCb">
@@ -69,6 +75,7 @@ export default function UserForm({user,onSave}) {
                 onChange={ev => setSeller(ev.target.checked)}
               />
               <span>Seller</span>
+              
             </label>
           </div>
           

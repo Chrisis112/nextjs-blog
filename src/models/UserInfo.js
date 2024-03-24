@@ -9,6 +9,8 @@ const UserInfoSchema = new Schema({
   phone: {type: String},
   admin: {type: Boolean, default: false},
   seller: {type: Boolean, default: false},
+  bonus: {type: String},
+
 }, {timestamps: true});
 
 export const UserInfo = models?.UserInfo || model('UserInfo', UserInfoSchema);

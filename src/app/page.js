@@ -4,6 +4,7 @@ import HomeMenu from "@/components/layout/HomeMenu";
 import SectionHeaders from "@/components/layout/SectionHeaders";
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from "@vercel/analytics/react"
+import TrendingSlider from "@/components/TrendingSlider";
 
 
 export default function Home() {
@@ -12,7 +13,9 @@ export default function Home() {
     <>
     <SpeedInsights/>
     <Analytics/>
+   <TrendingSlider/>
       <Hero />
+      
       <HomeMenu />
       <section className="text-center my-16" id="about">
         <SectionHeaders
@@ -34,7 +37,7 @@ export default function Home() {
         />
         <div className="mt-8">
           <a className="text-4xl underline text-gray-500" href="tel:+46738123123">
-            +00 000 00 0
+            +372 5665 0230
           </a>
         </div>
       </section>

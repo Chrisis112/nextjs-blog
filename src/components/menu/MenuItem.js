@@ -71,13 +71,15 @@ export default function MenuItem(menuItem) {
         <div
           onClick={() => setShowPopup(false)}
           className="fixed inset-0 bg-black/80 flex items-center justify-center">
-          <div
+          <div style= {{
+                width: "200px"
+              }}
             onClick={ev => ev.stopPropagation()}
             className="my-8 bg-white p-2 rounded-lg max-w-md">
             <div
               className="overflow-y-scroll p-2 items-center"
               style={{maxHeight:'calc(100vh - 100px)'}}>
-              <Image
+              <Image 
                 src={image}
                 alt={name}
                 width={220} height={300}

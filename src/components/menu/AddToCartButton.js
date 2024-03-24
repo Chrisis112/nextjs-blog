@@ -4,7 +4,7 @@ export default function AddToCartButton({
 }) {
   if (!hasSizesOrExtras) {
     return (
-      <div className="flying-button-parent mt-4">
+      <div className=" mt-3">
         <button
           targetTop={'5%'}
           targetLeft={'95%'}
@@ -20,7 +20,7 @@ export default function AddToCartButton({
     <button
       type="button"
       onClick={onClick}
-      className="mt-4 bg-primary text-white rounded-full px-8 py-2"
+      className="mt-4 bg-primary text-white rounded-full px-12 py-1 "
     >
       <span>Add to cart (from €{basePrice})</span>
     </button>
