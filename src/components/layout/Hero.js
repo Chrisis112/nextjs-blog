@@ -3,11 +3,11 @@ export default function Hero() {
     <section className="hero md:mt-4">
       <div className="py-8 md:py-12">
         <h1 className="text-4xl font-semibold">
-          Everything<br />
-          is better<br />
-          with a&nbsp;
+        Where<br />
+        your<br />
+        tea journey&nbsp;
           <span className="text-primary">
-            Bubble tea
+          begins 
           </span>
         </h1>
        

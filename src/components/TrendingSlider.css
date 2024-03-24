@@ -7,18 +7,13 @@
 	display: flex;
 	align-items: center;
 	padding: 0 20px;
-	max-height: auto;
-	max-height: 25;
-	display: block;
-	max-width: auto;
-	
 }
 
 .wrapper:before, .wrapper:after {
 	content: "";
 	position: absolute;
-	height: 100px;
-	width: 100px;
+	height: 200px;
+	width: 200px;
 	z-index: 2;
 }
 
@@ -36,15 +31,15 @@
 .wrapper .track {
 	display: flex;
 	width: calc(150px * 10);
-	animation: scroll 12s 0.1s linear infinite;
+	animation: scroll 12s 0.5s linear infinite;
 }
 
 .wrapper .logo {
-	width: 200px;
+	width: 300px;
 }
 
 .wrapper .logo img {
-	height: 500px;
+	height: 900px;
 }
 .firstImage {
   height: 100%;
@@ -67,12 +62,6 @@
 		transform: translateX(0);
 	}
 	to {
-		transform: translateX(calc(-150px * 9));
+		transform: translateX(calc(-150px * 8.5));
 	}
 }
-@media only screen and (max-width: 600px) {
-	.wrapper {
-		min-width: 400px;
-		min-height: 50%;
-	}
-  }
