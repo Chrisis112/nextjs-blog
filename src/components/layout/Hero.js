@@ -1,10 +1,12 @@
+
 export default function Hero() {
   return (
-    <section className="hero md:mt-4">
+    <div  >
+    <section  className="hero md:mt-4">
       <div className="py-8 md:py-12">
         <h1 className="text-4xl font-semibold">
-        Where<br />
-        your<br />
+        Where
+        your
         tea journey&nbsp;
           <span className="text-primary">
           begins 
@@ -16,5 +18,6 @@ export default function Hero() {
        <Image src={'/pizza.png'} layout={'fill'} objectFit={'contain'} alt={'pizza'} />
       </div> */}
     </section>
+    </div>
   );
 }

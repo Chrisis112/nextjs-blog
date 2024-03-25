@@ -37,10 +37,26 @@ export default function Home() {
           subHeader={'Don\'t hesitate'}
           mainHeader={'Contact us'}
         />
-        <div className="mt-8">
-          <a className="text-4xl underline text-gray-500" href="tel:+46738123123">
+        <div className="mt-4">
+          <a className="text-2xl underline text-gray-500" href="tel:+372 5665 0230">
             +372 5665 0230
-          </a>
+          </a> 
+          <div className="mt-2">
+          <a className="text-2xl underline text-gray-500" href="mailto:info@naichai.ee" >
+          info@naichai.ee
+        </a>
+        </div>
+        <br/>
+        <div className="mt-2">
+        <a className="text-2xl  text-gray-500" >
+          Mündi 3
+         
+        </a>
+        </div>
+        <div className=" max-h-auto max-h-25 block mx-auto flex block mx-auto ">
+          <iframe className=" max-h-auto max-h-25 block mx-auto flex block mx-auto " src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2028.7123922277576!2d24.742332876980115!3d59.437871202327905!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4692936246d2a049%3A0xb9a7adb20d277086!2sM%C3%BCndi%203%2C%2010123%20Tallinn!5e0!3m2!1sru!2see!4v1711325799134!5m2!1sru!2see" width="300" height="400" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+          
         </div>
       </section>
     </>

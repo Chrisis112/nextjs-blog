@@ -52,8 +52,8 @@ export default function Header() {
   }
   console.log(session);
   return (
-    <header>
-      <div className="flex items-center md:hidden justify-between">
+    <header className="border-b" >
+      <div  className=" flex underline items-center md:hidden justify-between">
       <Link className="text-primary font-semibold text-2xl" href={'/'}>
           <Image src={'/logo123.png'} width={100} height={180}  alt={'sallad'} />
           </Link>

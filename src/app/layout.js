@@ -1,10 +1,11 @@
 import {AppProvider} from "@/components/AppContext";
 import Header from "@/components/layout/Header";
-import { Balthazar} from 'next/font/google'
+import { Comfortaa} from 'next/font/google'
 import './globals.css'
 import {Toaster} from "react-hot-toast";
 
-const roboto = Balthazar({ subsets: ['latin'], weight: ['400'] })
+const roboto = Comfortaa({ subsets: ['latin'], weight: ['400', '500', '700'] });
+
 
 
 export const metadata = {
@@ -19,7 +20,8 @@ export default function RootLayout({ children }) {
         <main className="max-w-4xl mx-auto p-4">
           <AppProvider>
             <Toaster />
-            <Header />
+            <Header   />
+            
             {children}
             <footer className="border-t p-8 text-center text-gray-500 mt-16">
               &copy; 2024 All rights reserved
