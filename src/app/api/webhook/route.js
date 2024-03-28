@@ -9,16 +9,6 @@ export async function POST(req) {
   const sig = req.headers.get('stripe-signature');
   let event;
   
-async function incrementUserPoints(points) {
-  try {
-      await User.updateOne({ points }, { $inc: { points: 1 } });
-  } catch (error) {
-      console.error('Error incrementing user points:', error);
-      throw error;
-  }
-}
-
-module.exports = incrementUserPoints;
 
   try {
     const reqBuffer = await req.text();
