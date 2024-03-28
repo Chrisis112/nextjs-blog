@@ -56,7 +56,7 @@ export default function UserForm({user,onSave}) {
           setAddressProp={handleAddressChange}
         />
         <span>
-            Your bonus points: {loggedInUserData?.bonus}
+            Your bonus points: {loggedInUserData?.points}
             </span>
         {loggedInUserData.admin && (
           <div>

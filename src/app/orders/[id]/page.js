@@ -11,6 +11,9 @@ export default function OrderPage() {
   const [order, setOrder] = useState();
   const [loadingOrder, setLoadingOrder] = useState(true);
   const {id} = useParams();
+  const [orderNumber, setOrderNumber] = useState(0);
+  
+
   useEffect(() => {
     if (typeof window.console !== "undefined") {
       if (window.location.href.includes('clear-cart=1')) {
@@ -19,10 +22,11 @@ export default function OrderPage() {
     }
     if (id) {
       setLoadingOrder(true);
-      fetch('/api/orders?_id='+id).then(res => {
+      fetch('/api/orders?_id='+id ).then(res => {
         res.json().then(orderData => {
           setOrder(orderData);
           setLoadingOrder(false);
+          setOrderNumber(orderNumber);
         });
       })
     }
@@ -34,7 +38,7 @@ export default function OrderPage() {
       subtotal += cartProductPrice(product);
     }
   }
-
+  
   return (
     <section className="max-w-2xl mx-auto mt-8">
       <div className="text-center">
@@ -51,6 +55,7 @@ export default function OrderPage() {
       {order && (
         <div className="grid  md:gap-16">
           <div>
+          <p>Your Order Number: {order.orderNumber}</p>
             {order.cartProducts.map(product => (
               <CartProduct key={product._id} product={product} />
             ))}

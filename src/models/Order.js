@@ -8,6 +8,7 @@ const OrderSchema = new Schema({
   city: String,
   country: String,
   cartProducts: Object,
+  orderNumber: {type:Number, required: true},
   paid: {type: Boolean, default: false},
 }, {timestamps: true});
 

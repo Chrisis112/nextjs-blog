@@ -6,10 +6,13 @@ import {dbTimeForHuman} from "@/libs/datetime";
 import Link from "next/link";
 import {useEffect, useState} from "react";
 
+
+
 export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
   const {loading, data:profile} = useProfile();
+  const [orderNumber, setOrderNumber] = useState({});
 
   useEffect(() => {
     fetchOrders();
@@ -21,10 +24,11 @@ export default function OrdersPage() {
       res.json().then(orders => {
         setOrders(orders.reverse());
         setLoadingOrders(false);
+        setOrderNumber(orderNumber);
       })
     })
   }
-
+  
   return (
     <section className="mt-8 max-w-2xl mx-auto">
       <UserTabs isSeller ={profile.seller} isAdmin={profile.admin} />
@@ -44,6 +48,7 @@ export default function OrdersPage() {
                 }>
                   {order.paid ? 'Paid' : 'Not paid'}
                 </div>
+                <p>Order Number: {order.orderNumber}</p>
               </div>
               <div className="grow">
                 <div className="flex gap-2 items-center mb-1">

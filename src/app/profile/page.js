@@ -14,6 +14,7 @@ export default function ProfilePage() {
   const [isSeller, setIsSeller] = useState(false);
   const [profileFetched, setProfileFetched] = useState(false);
   const {status} = session;
+  const [points, setPoints] = useState(0);
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -23,10 +24,12 @@ export default function ProfilePage() {
           setIsAdmin(data.admin);
           setIsSeller(data.seller);
           setProfileFetched(true);
+          setPoints(data.points);
         })
       });
     }
   }, [session, status]);
+  
 
   async function handleProfileInfoUpdate(ev, data) {
     ev.preventDefault();
@@ -63,7 +66,7 @@ export default function ProfilePage() {
     <section className="mt-8">
       <UserTabs isAdmin={isAdmin} isSeller = {isSeller} />
       <div className="max-w-2xl mx-auto mt-8">
-        <UserForm user={user} onSave={handleProfileInfoUpdate} />
+        <UserForm user={user} points={points} onSave={handleProfileInfoUpdate} />
       </div>
       
     </section>

@@ -1,5 +1,6 @@
 import {Order} from "@/models/Order";
-import {UserForm} from "@/components/layout/UserForm";
+import { UserInfo } from "@/models/UserInfo";
+
 
 
 const stripe = require('stripe')(process.env.STRIPE_SK);
@@ -7,6 +8,17 @@ const stripe = require('stripe')(process.env.STRIPE_SK);
 export async function POST(req) {
   const sig = req.headers.get('stripe-signature');
   let event;
+  
+async function incrementUserPoints(points) {
+  try {
+      await User.updateOne({ points }, { $inc: { points: 1 } });
+  } catch (error) {
+      console.error('Error incrementing user points:', error);
+      throw error;
+  }
+}
+
+module.exports = incrementUserPoints;
 
   try {
     const reqBuffer = await req.text();
@@ -16,16 +28,20 @@ export async function POST(req) {
     console.error('stripe error');
     console.log(e);
     return Response.json(e, {status: 400});
+    
   }
 
   if (event.type === 'checkout.session.completed') {
     console.log(event);
+   
     const orderId = event?.data?.object?.metadata?.orderId;
-    
     const isPaid = event?.data?.object?.payment_status === 'paid';
+    const userEmail = event?.data?.object?.customer_email;
+    const user = await UserInfo.findOne({ email: userEmail });
     if (isPaid) {
-      await Order.updateOne({_id:orderId}, {paid:true});
       
+      await Order.updateOne({_id:orderId}, {paid:true});
+      await UserInfo.updateOne( {_id:user},{ $inc: { points: 1 } }, { new: true });
     }
   }
 

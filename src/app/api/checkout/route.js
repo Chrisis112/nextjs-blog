@@ -3,21 +3,51 @@ import {MenuItem} from "@/models/MenuItem";
 import {Order} from "@/models/Order";
 import mongoose from "mongoose";
 import {getServerSession} from "next-auth";
+import { User } from "@/models/User";
 const stripe = require('stripe')(process.env.STRIPE_SK);
+
 
 export async function POST(req) {
   mongoose.connect(process.env.MONGO_URL);
   console.log (req.headers)
 
+
+  async function generateOrderNumber() {
+    try {
+        const lastOrder = await Order.findOne().sort({ _id: -1 }).exec();
+        const orderNumber = lastOrder ? lastOrder.orderNumber + 1 : 1;
+        return orderNumber > 99 ? 1 : orderNumber;
+    } catch (error) {
+        console.error('Error generating order number:', error);
+        throw error;
+    }
+}
+module.exports = generateOrderNumber;
+
+async function incrementUserPoints(points) {
+  try {
+      await User.updateOne({ points }, { $inc: { points: 1 } });
+  } catch (error) {
+      console.error('Error incrementing user points:', error);
+      throw error;
+  }
+}
+
+module.exports = incrementUserPoints;
+
+
   const {cartProducts, address} = await req.json();
   const session = await getServerSession(authOptions);
   const userEmail = session?.user?.email;
+  const userPoints = session?.user?.points;
 
   const orderDoc = await Order.create({
     userEmail,
     ...address,
     cartProducts,
     paid: false, 
+    orderNumber: await generateOrderNumber(),
+    userPoints: await incrementUserPoints (),
   });
 
   const stripeLineItems = [];

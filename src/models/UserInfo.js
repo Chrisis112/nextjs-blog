@@ -9,7 +9,7 @@ const UserInfoSchema = new Schema({
   phone: {type: String},
   admin: {type: Boolean, default: false},
   seller: {type: Boolean, default: false},
-  bonus: {type: String},
+  points: {type: Number, default: 0},
 
 }, {timestamps: true});
 
