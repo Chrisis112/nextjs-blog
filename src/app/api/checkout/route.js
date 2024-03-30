@@ -3,6 +3,7 @@ import {MenuItem} from "@/models/MenuItem";
 import {Order} from "@/models/Order";
 import mongoose from "mongoose";
 import {getServerSession} from "next-auth";
+import { UserInfo } from "@/models/UserInfo";
 const stripe = require('stripe')(process.env.STRIPE_SK);
 
 
@@ -38,7 +39,9 @@ module.exports = generateOrderNumber;
   for (const cartProduct of cartProducts) {
 
     const productInfo = await MenuItem.findById(cartProduct._id);
-
+    const productInfoPoints = await MenuItem.findById(cartProduct.points);
+    const userId = await UserInfo.findOne({ email: userEmail });
+    const userPoints = getUserPoints(userId);
     let productPrice = productInfo.basePrice;
     if (cartProduct.size) {
       const size = productInfo.sizes
@@ -52,7 +55,12 @@ module.exports = generateOrderNumber;
           .find(extra => extra._id.toString() === cartProductExtraThing._id.toString());
         productPrice += extraThingInfo.price;
       }
-    }
+      if (userPoints >= productInfoPoints) {
+        // Sufficient points, deduct points from the user's account
+        updateUserPoints(userId, userPoints - orderAmount);
+        res.status(200).json({ success: true });
+      } 
+  }   
 
     const productName = cartProduct.name;
 
@@ -80,6 +88,7 @@ module.exports = generateOrderNumber;
       metadata:{orderId:orderDoc._id.toString()},
     },
   });
+
   async function getUserPoints(userEmail) {
     try {
         const user = await UserInfo.findOne({ email: userEmail }); 
@@ -95,11 +104,10 @@ module.exports = generateOrderNumber;
 }
 async function updateUserPoints(userEmail, newPoints) {
   try {
-      // Assuming you're using some ORM or database library like Prisma, Sequelize, or plain SQL
       const user = await UserInfo.findOne({ email: userEmail });
       if (!user) {
           user.points = newPoints;
-          await user.save(); // Save updated user points to the database
+          await user.save();
       } else {
           throw new Error('User not found');
       }
@@ -107,6 +115,7 @@ async function updateUserPoints(userEmail, newPoints) {
       console.error('Error updating user points:', error);
       throw new Error('Failed to update user points');
   }
+  
 }
   
 

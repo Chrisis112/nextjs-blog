@@ -13,6 +13,11 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'oazys-food-ordering.s3.amazonaws.com',
       },
+      {
+        
+        protocol: 'https',
+        hostname: 'i.imgur.com',
+      },
     ]
   }
 }

@@ -6,6 +6,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from "@vercel/analytics/react"
 import TrendingSlider from "@/components/TrendingSlider";
 import Hero2 from "@/components/layout/Hero2";
+import Image from "next/image";
 
 export default function Home() {
   
@@ -14,10 +15,9 @@ export default function Home() {
     <SpeedInsights/>
     <Analytics/>
     <Hero2/>
-    <img className="max-h-auto max-h-25 block mx-auto" src="https://i.imgur.com/DL8lA2O.png"></img>
+    <Image alt="Boba" width={700} height={700} className="max-h-auto max-h-25 block mx-auto" src="https://i.imgur.com/DL8lA2O.png"/>
    <TrendingSlider/>
       <Hero />
-      
       <HomeMenu />
       <section className="text-center my-16" id="about">
         <SectionHeaders

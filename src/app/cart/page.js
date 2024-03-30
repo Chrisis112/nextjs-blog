@@ -1,14 +1,11 @@
 'use client';
 import {CartContext, cartProductPrice, cartProductPrice2} from "@/components/AppContext";
-import AddressInputs from "@/components/layout/AddressInputs";
 import SectionHeaders from "@/components/layout/SectionHeaders";
 import {useProfile} from "@/components/UseProfile";
 import {useContext, useEffect, useState} from "react";
 import toast from "react-hot-toast";
 import Trash from "@/components/icons/Trash"
 import Image from "next/image";;
-import { UserInfo } from "@/models/UserInfo";
-
 export default function CartPage() {
   const {cartProducts,removeCartProduct} = useContext(CartContext);
   const [address, setAddress] = useState({});

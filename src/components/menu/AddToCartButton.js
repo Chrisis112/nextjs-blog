@@ -1,6 +1,6 @@
 
 export default function AddToCartButton({
-  hasSizesOrExtras, onClick, basePrice, image, pricePoints
+  hasSizesOrExtras, onClick, basePrice, image,
 }) {
   if (!hasSizesOrExtras) {
     return (

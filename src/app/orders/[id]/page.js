@@ -30,7 +30,7 @@ export default function OrderPage() {
         });
       })
     }
-  }, []);
+  }, [id, orderNumber]);
 
   let subtotal = 0;
   if (order?.cartProducts) {
