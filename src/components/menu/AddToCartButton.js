@@ -1,6 +1,6 @@
 
 export default function AddToCartButton({
-  hasSizesOrExtras, onClick, basePrice, image
+  hasSizesOrExtras, onClick, basePrice, image, pricePoints
 }) {
   if (!hasSizesOrExtras) {
     return (
@@ -12,10 +12,12 @@ export default function AddToCartButton({
           <div onClick={onClick}>
             Add to cart €{basePrice}
           </div>
+          
         </button>
       </div>
     );
   }
+  
   return (
     <button
       type="button"
@@ -24,5 +26,8 @@ export default function AddToCartButton({
     >
       <span>Add to cart (from €{basePrice})</span>
     </button>
+    
+    
+    
   );
 }

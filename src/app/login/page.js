@@ -36,15 +36,15 @@ export default function LoginPage() {
           
           <Link className="underline" href={'/register'}>Create account &raquo;</Link>
         </div>
-        <div className="my-4 text-center text-gray-500">
+      { /* <div className="my-4 text-center text-gray-500">
           or 
         </div>
         <button type="button" onClick={() => signIn('google', {callbackUrl: '/'})}
                 className="flex gap-4 justify-center">
           <Image src={'/google.png'} alt={''} width={24} height={24} />
           Login with Google
-        </button>
-        {/* <button type="button" onClick={() => signIn('apple', {callbackUrl: '/'})}
+        </button>}
+        /* <button type="button" onClick={() => signIn('apple', {callbackUrl: '/'})}
                 className="flex gap-5 justify-center">
           <Image src={'/apple.png'} alt={''} width={24} height={24} />
           Login with apple

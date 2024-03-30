@@ -3,15 +3,12 @@ import {MenuItem} from "@/models/MenuItem";
 import {Order} from "@/models/Order";
 import mongoose from "mongoose";
 import {getServerSession} from "next-auth";
-import { User } from "@/models/User";
 const stripe = require('stripe')(process.env.STRIPE_SK);
 
 
 export async function POST(req) {
   mongoose.connect(process.env.MONGO_URL);
   console.log (req.headers)
-
-
   async function generateOrderNumber() {
     try {
         const lastOrder = await Order.findOne().sort({ _id: -1 }).exec();
@@ -24,22 +21,10 @@ export async function POST(req) {
 }
 module.exports = generateOrderNumber;
 
-async function incrementUserPoints(points) {
-  try {
-      await User.updateOne({ points }, { $inc: { points: 1 } });
-  } catch (error) {
-      console.error('Error incrementing user points:', error);
-      throw error;
-  }
-}
-
-module.exports = incrementUserPoints;
-
-
   const {cartProducts, address} = await req.json();
   const session = await getServerSession(authOptions);
   const userEmail = session?.user?.email;
-  const userPoints = session?.user?.points;
+  const userPhone = session?.user?.phone;
 
   const orderDoc = await Order.create({
     userEmail,
@@ -47,7 +32,6 @@ module.exports = incrementUserPoints;
     cartProducts,
     paid: false, 
     orderNumber: await generateOrderNumber(),
-    userPoints: await incrementUserPoints (),
   });
 
   const stripeLineItems = [];
@@ -83,19 +67,48 @@ module.exports = incrementUserPoints;
       },
     });
   }
-
+  
   const stripeSession = await stripe.checkout.sessions.create({
     line_items: stripeLineItems,
     mode: 'payment',
     customer_email: userEmail,
+    customer_phone:userPhone,
     success_url: process.env.NEXTAUTH_URL + 'orders/' + orderDoc._id.toString() + '?clear-cart=1',
     cancel_url: process.env.NEXTAUTH_URL + 'cart?canceled=1',
     metadata: {orderId:orderDoc._id.toString()},
     payment_intent_data: {
       metadata:{orderId:orderDoc._id.toString()},
     },
-    
   });
+  async function getUserPoints(userEmail) {
+    try {
+        const user = await UserInfo.findOne({ email: userEmail }); 
+        if (user) {
+            return user.points;
+        } else {
+            throw new Error('User not found');
+        }
+    } catch (error) {
+        console.error('Error retrieving user points:', error);
+        throw new Error('Failed to retrieve user points');
+    }
+}
+async function updateUserPoints(userEmail, newPoints) {
+  try {
+      // Assuming you're using some ORM or database library like Prisma, Sequelize, or plain SQL
+      const user = await UserInfo.findOne({ email: userEmail });
+      if (!user) {
+          user.points = newPoints;
+          await user.save(); // Save updated user points to the database
+      } else {
+          throw new Error('User not found');
+      }
+  } catch (error) {
+      console.error('Error updating user points:', error);
+      throw new Error('Failed to update user points');
+  }
+}
+  
 
   return Response.json(stripeSession.url);
 }

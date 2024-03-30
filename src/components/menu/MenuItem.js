@@ -2,11 +2,12 @@ import {CartContext} from "@/components/AppContext";
 import MenuItemTile from "@/components/menu/MenuItemTile";
 import Image from "next/legacy/image";
 import {useContext, useState} from "react";
+import {useProfile} from "@/components/UseProfile";
 
 export default function MenuItem(menuItem) {
   const {
     image,name,description,basePrice,
-    sizes, extraIngredientPrices, temperature
+    sizes, extraIngredientPrices, temperature, pricePoints
   } = menuItem;
   const [
     selectedSize, setSelectedSize
@@ -17,6 +18,8 @@ export default function MenuItem(menuItem) {
   const [selectedExtras, setSelectedExtras] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const {addToCart} = useContext(CartContext);
+  const [address, setAddress] = useState({});
+  const {data:profileData} = useProfile();
 
   async function handleAddToCartButtonClick() {
     console.log('add to cart');
@@ -40,30 +43,25 @@ export default function MenuItem(menuItem) {
       });
     }
   }
-  function handleTemperature(ev, extraTemp) {
-    const checked2 = ev.target.checked;
-    if (checked2) {
-      setSelectedTemperature(prev => [...prev, extraTemp]);
-    } else {
-      setSelectedTemperature(prev => {
-        return prev.filter(e => e.name !== extraTemp.name);
-      });
-    }
-  }
 
   let selectedPrice = basePrice;
+  let selectedPoints = pricePoints;
   if (selectedSize) {
     selectedPrice += selectedSize.price;
+    selectedPoints += selectedSize.price;
   }
   if (selectedExtras?.length > 0) {
     for (const extra of selectedExtras) {
       selectedPrice += extra.price;
+      selectedPoints += extra.price;
     }
   }if (selectedTemperature?.length > 0) {
     for (const temp of selectedTemperature) {
       selectedPrice += temp.price;
+      selectedPoints += temp.price;
     }
   }
+  
 
   return (
     <>
@@ -101,6 +99,7 @@ export default function MenuItem(menuItem) {
                         checked={selectedSize?.name === size.name}
                         name="size"/>
                       {size.name} €{basePrice + size.price}
+                      
                     </label>
                   ))}
                 </div>
@@ -146,7 +145,25 @@ export default function MenuItem(menuItem) {
                 <div className="primary sticky bottom-2"
                      onClick={handleAddToCartButtonClick}>
                   Add to cart €{selectedPrice}
+                 
                 </div>
+                
+              </button>
+              <button
+                targetTop={'5%'}
+                targetLeft={'95%'}
+                src={image}>
+                <div className="primary sticky bottom-2"
+                     onClick={handleAddToCartButtonClick}></div>
+                  {profileData.city&& (
+          
+             <div className="mt-4 primary sticky bottom-2"
+             onClick={handleAddToCartButtonClick}>
+            Add to cart for {pricePoints} Points
+          
+          </div>
+          
+        )}
               </button>
               <button
                 className="mt-2"

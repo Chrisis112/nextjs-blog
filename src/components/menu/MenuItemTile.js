@@ -2,8 +2,7 @@ import AddToCartButton from "@/components/menu/AddToCartButton";
 
 export default function MenuItemTile({onAddToCart, ...item}) {
   const {image, description, name, basePrice,
-    sizes, extraIngredientPrices, temperature
-  } = item;
+    sizes, extraIngredientPrices, temperature, pricePoints  } = item;
   const hasSizesOrExtras = sizes?.length > 0 || temperature?.length > 0 || extraIngredientPrices?.length > 0;
   return (
     <div className="bg-gray-200 p-4 rounded-lg text-center
@@ -20,6 +19,7 @@ export default function MenuItemTile({onAddToCart, ...item}) {
         hasSizesOrExtras={hasSizesOrExtras}
         onClick={onAddToCart}
         basePrice={basePrice}
+        PricePoints= {pricePoints}
       />
     </div>
   );

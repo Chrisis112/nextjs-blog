@@ -16,7 +16,9 @@ export async function GET(req) {
   if (_id) {
     return Response.json( await Order.findById(_id) );
   }
-
+  if (seller) {
+    return Response.json( await Order.find() );
+  }
 
   if (admin) {
     return Response.json( await Order.find() );
@@ -25,9 +27,7 @@ export async function GET(req) {
   if (userEmail) {
     return Response.json( await Order.find({userEmail}) );
   }
-  if (seller) {
-    return Response.json( await Order.find() );
-  }
+  
 
 
 }

@@ -18,6 +18,7 @@ export default function UserTabs({isAdmin})  {
       >
         Orders
          </Link>
+         
       {isAdmin &&  (
         <>
           <Link
@@ -38,6 +39,7 @@ export default function UserTabs({isAdmin})  {
           >
             Users
           </Link> 
+          
         </>
     )}
     </div>

@@ -3,6 +3,7 @@ import {signIn} from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import {useState} from "react";
+import Agreement from "@/components/menu/Agreement";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
@@ -10,11 +11,13 @@ export default function RegisterPage() {
   const [creatingUser, setCreatingUser] = useState(false);
   const [userCreated, setUserCreated] = useState(false);
   const [error, setError] = useState(false);
+  const [agreement, setAgreement] = useState(false);
   async function handleFormSubmit(ev) {
     ev.preventDefault();
     setCreatingUser(true);
     setError(false);
     setUserCreated(false);
+    setAgreement(false)
     const response = await fetch('/api/register', {
       method: 'POST',
       body: JSON.stringify({email, password}),
@@ -28,6 +31,7 @@ export default function RegisterPage() {
     }
     setCreatingUser(false);
   }
+ 
   return (
     <section className="mt-8">
       <h1 className="text-center text-primary text-4xl mb-4">
@@ -53,6 +57,15 @@ export default function RegisterPage() {
         <input required  type="password" placeholder="password" value={password}
                disabled={creatingUser}
                 onChange={ev => setPassword(ev.target.value)}/>
+                <label className="p-2 inline-flex items-center gap-2 mb-2" htmlFor="adminCb">
+              <input
+              required type="checkbox"
+                value={agreement}
+                disabled={creatingUser}
+                onChange={ev => setAgreement(ev.target.checked)}
+              />
+              <span>Nõustun <Link className="underline" href={'/terms'}>teenustetingimuste </Link> ja <Link className="underline" href={'/privacy'}>privaatsuspoliitika</Link></span>
+            </label>
         <button type="submit" disabled={creatingUser}>
           Register
         </button>
@@ -64,7 +77,9 @@ export default function RegisterPage() {
           className="flex gap-4 justify-center">
           <Image src={'/google.png'} alt={''} width={24} height={24} />
           Sign up with Google
-        </button>
+        </button> 
+        <div className="my-4 text-center text-gray-500" >
+        Vajutates nõustute <Link className="underline" href={'/terms'}>teenustetingimuste </Link> ja <Link className="underline" href={'/privacy'}>privaatsuspoliitika</Link> töötlemisega</div>
         {/* <button type="button" onClick={() => signIn('apple', {callbackUrl: '/'})}
                 className="flex gap-5 justify-center">
           <Image src={'/apple.png'} alt={''} width={24} height={24} />
@@ -73,6 +88,7 @@ export default function RegisterPage() {
         <div className="text-center my-4 text-gray-500 border-t pt-4">
           Existing account?{' '}
           <Link className="underline" href={'/login'}>Login here &raquo;</Link>
+          
         </div>
       </form>
     </section>

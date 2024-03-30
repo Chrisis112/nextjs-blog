@@ -1,5 +1,5 @@
 'use client';
-import {CartContext, cartProductPrice} from "@/components/AppContext";
+import {CartContext, cartProductPrice, cartProductPrice2} from "@/components/AppContext";
 import AddressInputs from "@/components/layout/AddressInputs";
 import SectionHeaders from "@/components/layout/SectionHeaders";
 import {useProfile} from "@/components/UseProfile";
@@ -7,6 +7,7 @@ import {useContext, useEffect, useState} from "react";
 import toast from "react-hot-toast";
 import Trash from "@/components/icons/Trash"
 import Image from "next/image";;
+import { UserInfo } from "@/models/UserInfo";
 
 export default function CartPage() {
   const {cartProducts,removeCartProduct} = useContext(CartContext);
@@ -36,16 +37,14 @@ export default function CartPage() {
   }, [profileData]);
 
   let subtotal = 0;
+  let subtotal2= 0
   for (const p of cartProducts) {
     subtotal += cartProductPrice(p);
-  }
-  function handleAddressChange(propName, value) {
-    setAddress(prevAddress => ({...prevAddress, [propName]:value}));
+    subtotal2 += cartProductPrice2(p);
   }
   async function proceedToCheckout(ev) {
     ev.preventDefault();
     // address and shopping cart products
-
     const promise = new Promise((resolve, reject) => {
       fetch('/api/checkout', {
         method: 'POST',
@@ -63,7 +62,6 @@ export default function CartPage() {
         }
       });
     });
-
     await toast.promise(promise, {
       loading: 'Preparing your order...',
       success: 'Redirecting to payment...',
@@ -79,7 +77,6 @@ export default function CartPage() {
       </section>
     );
   }
-
   return (
     <section className="mt-8">
       <div className="text-center">
@@ -113,6 +110,7 @@ export default function CartPage() {
                 <div className="text-sm text-gray-500">
                   {product.extras.map(extra => (
                     <div key={extra.name}>{extra.name} €{extra.price}</div>
+                    
                   ))}
                   
                 </div>
@@ -120,7 +118,12 @@ export default function CartPage() {
             </div>
             <div  className="text-lg font-semibold">
             €{cartProductPrice(product)}
-            
+            {profileData.city&& (
+          <div>
+            For points:{cartProductPrice2(product)}
+          </div>
+          
+        )}
             </div>
             {  (
               <div className="ml-2">
@@ -149,15 +152,20 @@ export default function CartPage() {
             </div>
             <div className="font-semibold pl-2 text-right">
               €{subtotal}<br />
-              
-              
             </div>
+            
           </div>
           <div >
             <br/>
           <form onSubmit={proceedToCheckout}>
             <button  type="submit">Pay €{subtotal}</button>
           </form>
+          {profileData.city&& (
+          <form onSubmit={PayWithPoints}>
+          <button  type="submit">Pay with points{ subtotal2}</button>
+        </form>
+        )}
+        
         </div>
         </div>
         

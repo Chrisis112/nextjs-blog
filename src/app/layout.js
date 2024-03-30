@@ -3,6 +3,7 @@ import Header from "@/components/layout/Header";
 import { Comfortaa} from 'next/font/google'
 import './globals.css'
 import {Toaster} from "react-hot-toast";
+import Link from "next/link";
 
 const roboto = Comfortaa({ subsets: ['latin'], weight: ['400', '500', '700'] });
 
@@ -25,6 +26,12 @@ export default function RootLayout({ children }) {
             {children}
             <footer className="border-t p-8 text-center text-gray-500 mt-16">
               &copy; 2024 All rights reserved
+              <div>
+              <Link className="underline" href={'/terms'}>Kasutustingimused</Link>
+              <div id="Privacy">
+              <Link className="underline" href={'/terms/#Privacy'}>Privaatsuspoliitika</Link>
+              </div>
+              </div>
             </footer>
           </AppProvider>
         </main>

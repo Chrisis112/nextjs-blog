@@ -44,9 +44,9 @@ export default function OrderPage() {
       <div className="text-center">
         <SectionHeaders mainHeader="Your order" />
         <div className="mt-4 mb-8">
-          <p>Thanks for your order.</p>
-          <p>We will call you when your order will be ready!</p>
-          <p>You can take your order at Münd 3 NaiChai bubble tea store.</p>
+          <p>Thanks for your order!</p>
+          <p>We will call you when your order is ready.</p>
+          <p>You can pick up your order at Mündi 3 NaiChai Bubble Tea Bar.</p>
         </div>
       </div>
       {loadingOrder && (

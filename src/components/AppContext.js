@@ -7,8 +7,10 @@ export const CartContext = createContext({});
 
 export function cartProductPrice(cartProduct) {
   let price = cartProduct.basePrice;
+  
   if (cartProduct.size) {
     price += cartProduct.size.price;
+
   }
   if (cartProduct.extras?.length > 0) {
     for (const extra of cartProduct.extras) {
@@ -21,7 +23,26 @@ export function cartProductPrice(cartProduct) {
   }
 }
   
-  return price;
+  return price; 
+}
+export function cartProductPrice2(cartProduct) {
+  let p2 = cartProduct.pricePoints
+  if (cartProduct.size) {
+    p2 += cartProduct.size.price;
+
+  }
+  if (cartProduct.extras?.length > 0) {
+    for (const extra of cartProduct.extras) {
+      p2 += extra.price;
+    }
+    if (cartProduct.temperature?.length > 0) {
+      for (const temperature of cartProduct.temperature) {
+        p2 += temperature.price;
+      }
+  }
+}
+  
+  return p2; 
 }
 
 export function AppProvider({children}) {

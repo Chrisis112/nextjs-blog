@@ -28,10 +28,12 @@ export async function POST(req) {
     const isPaid = event?.data?.object?.payment_status === 'paid';
     const userEmail = event?.data?.object?.customer_email;
     const user = await UserInfo.findOne({ email: userEmail });
+    const paymentAmount = event?.data?.object?.amount_total / 100; // Convert from cents to dollars
+      const pointsEarned = Math.floor(paymentAmount);
     if (isPaid) {
       
       await Order.updateOne({_id:orderId}, {paid:true});
-      await UserInfo.updateOne( {_id:user},{ $inc: { points: 1 } }, { new: true });
+      await UserInfo.updateOne( {_id:user},{ $inc: { points: pointsEarned } }, { new: true });
     }
   }
 
