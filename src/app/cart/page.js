@@ -161,8 +161,8 @@ export default function CartPage() {
             <button  type="submit">Pay €{subtotal}</button>
           </form>
           {profileData.city&& (
-          <form onSubmit={PayWithPoints}>
-          <button  type="submit">Pay with points{ subtotal2}</button>
+          <form className="mt-4" onSubmit={proceedToCheckout}>
+          <button  type="submit">Pay with points {subtotal2}</button>
         </form>
         )}
         
