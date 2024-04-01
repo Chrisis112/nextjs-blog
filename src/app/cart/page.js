@@ -6,20 +6,10 @@ import {useContext, useEffect, useState} from "react";
 import toast from "react-hot-toast";
 import Trash from "@/components/icons/Trash"
 import Image from "next/image";;
-import OneSignal from 'react-onesignal'
 export default function CartPage() {
 
-  
-  useEffect (() => {
-    OneSignal.init({
-      appId: "bf48c16a-3835-4de8-9e8e-220e4b0ae33b",
-    });
-  })
 
-const onHandleTag = (tag) => {
-  console.log ('tagging')
-  OneSignal.sendTag ('tech', tag) 
-}
+
   const {cartProducts,removeCartProduct} = useContext(CartContext);
   const [address, setAddress] = useState({});
   const {data:profileData} = useProfile();
@@ -51,6 +41,15 @@ const onHandleTag = (tag) => {
   for (const p of cartProducts) {
     subtotal += cartProductPrice(p);
     subtotal2 += cartProductPrice2(p);
+  }
+  const handleCheckout = async () => {
+    const response = await fetch('/api/create-checkout-session', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ amount: 0 }), // Specify 0 EUR amount
+    });
   }
   async function proceedToCheckout(ev) {
     ev.preventDefault();
