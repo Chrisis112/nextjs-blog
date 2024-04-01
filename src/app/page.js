@@ -8,10 +8,14 @@ import TrendingSlider from "@/components/TrendingSlider";
 import Hero2 from "@/components/layout/Hero2";
 import Image from "next/image";
 
+
 export default function Home() {
+
   
   return (
+    
     <>
+    
     <SpeedInsights/>
     <Analytics/>
     <Hero2/>

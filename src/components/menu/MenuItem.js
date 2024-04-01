@@ -149,22 +149,7 @@ export default function MenuItem(menuItem) {
                 </div>
                 
               </button>
-              <button
-                targetTop={'5%'}
-                targetLeft={'95%'}
-                src={image}>
-                <div className="primary sticky bottom-2"
-                     onClick={handleAddToCartButtonClick}></div>
-                  {profileData.city&& (
-          
-             <div className="mt-4 primary sticky bottom-2"
-             onClick={handleAddToCartButtonClick}>
-            Add to cart for {pricePoints} Points
-          
-          </div>
-          
-        )}
-              </button>
+
               <button
                 className="mt-2"
                 onClick={() => setShowPopup(false)}>

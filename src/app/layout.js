@@ -29,7 +29,7 @@ export default function RootLayout({ children }) {
               <div>
               <Link className="underline" href={'/terms'}>Kasutustingimused</Link>
               <div id="Privacy">
-              <Link className="underline" href={'/terms/#Privacy'}>Privaatsuspoliitika</Link>
+              <Link className="underline" href={'/terms/#privacy'}>Privaatsuspoliitika</Link>
               </div>
               </div>
             </footer>

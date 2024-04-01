@@ -6,7 +6,20 @@ import {useContext, useEffect, useState} from "react";
 import toast from "react-hot-toast";
 import Trash from "@/components/icons/Trash"
 import Image from "next/image";;
+import OneSignal from 'react-onesignal'
 export default function CartPage() {
+
+  
+  useEffect (() => {
+    OneSignal.init({
+      appId: "bf48c16a-3835-4de8-9e8e-220e4b0ae33b",
+    });
+  })
+
+const onHandleTag = (tag) => {
+  console.log ('tagging')
+  OneSignal.sendTag ('tech', tag) 
+}
   const {cartProducts,removeCartProduct} = useContext(CartContext);
   const [address, setAddress] = useState({});
   const {data:profileData} = useProfile();
@@ -113,7 +126,7 @@ export default function CartPage() {
                 </div>
               )}
             </div>
-            <div  className="text-lg font-semibold">
+            <div onClick={()=>onHandleTag('react')}  className="text-lg font-semibold">
             €{cartProductPrice(product)}
             {profileData.city&& (
           <div>

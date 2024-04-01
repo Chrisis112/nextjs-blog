@@ -40,8 +40,6 @@ module.exports = generateOrderNumber;
 
     const productInfo = await MenuItem.findById(cartProduct._id);
     const productInfoPoints = await MenuItem.findById(cartProduct.points);
-    const userId = await UserInfo.findOne({ email: userEmail });
-    const userPoints = getUserPoints(userId);
     let productPrice = productInfo.basePrice;
     if (cartProduct.size) {
       const size = productInfo.sizes
@@ -88,36 +86,5 @@ module.exports = generateOrderNumber;
       metadata:{orderId:orderDoc._id.toString()},
     },
   });
-
-  async function getUserPoints(userEmail) {
-    try {
-        const user = await UserInfo.findOne({ email: userEmail }); 
-        if (user) {
-            return user.points;
-        } else {
-            throw new Error('User not found');
-        }
-    } catch (error) {
-        console.error('Error retrieving user points:', error);
-        throw new Error('Failed to retrieve user points');
-    }
-}
-async function updateUserPoints(userEmail, newPoints) {
-  try {
-      const user = await UserInfo.findOne({ email: userEmail });
-      if (!user) {
-          user.points = newPoints;
-          await user.save();
-      } else {
-          throw new Error('User not found');
-      }
-  } catch (error) {
-      console.error('Error updating user points:', error);
-      throw new Error('Failed to update user points');
-  }
-  
-}
-  
-
   return Response.json(stripeSession.url);
 }
