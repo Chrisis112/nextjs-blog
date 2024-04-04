@@ -50,7 +50,7 @@ export default function CartPage() {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
         body: JSON.stringify({
-          cartProducts,
+          cartProducts
         }),
       }).then(async (response) => {
         if (response.ok) {
