@@ -1,7 +1,7 @@
 import {model, models, Schema} from "mongoose";
 
 const OrderSchema = new Schema({
-  uuserEmail: {String, required: false},
+  userEmail: {String, required: false},
   phone: {String, required: false},
   streetAddress: {String, required: false},
   postalCode: {String, required: false},
