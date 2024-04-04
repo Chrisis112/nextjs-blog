@@ -11,7 +11,7 @@ const roboto = Comfortaa({ subsets: ['latin'], weight: ['400', '500', '700'] });
 
 export const metadata = {
   title: 'NaiChai bubble tea',
-  description: 'We are all about bringing a taste of China to Estonia through our delicious bubble teas. Our journey began with a love for authentic ingredients and a desire to share the special tastes we discovered during our life in Asia. Our owner spent many years living in China, soaking up the culture and flavors of the authentic Asia.',
+  description: 'We are all about bringing a taste of China NaiChai to Estonia through our delicious bubble tea. Our journey began with a love for authentic ingredients and a desire to share the taste.',
 }
 
 export default function RootLayout({ children }) {
