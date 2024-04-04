@@ -51,12 +51,12 @@ module.exports = generateOrderNumber;
           .find(extra => extra._id.toString() === cartProductExtraThing._id.toString());
         productPrice += extraThingInfo.price;
       }
-      if (userPoints >= productInfoPoints) {
+  }  
+    if (userPoints >= productInfoPoints) {
         // Sufficient points, deduct points from the user's account
         updateUserPoints(userId, userPoints - orderAmount);
         res.status(200).json({ success: true });
       } 
-  }   
 
     const productName = cartProduct.name;
 
