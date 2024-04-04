@@ -21,13 +21,13 @@ export async function POST(req) {
 }
 module.exports = generateOrderNumber;
 
-
-  const cartProducts = await req.json();
+  const {cartProducts, address} = await req.json();
   const session = await getServerSession(authOptions);
   const userEmail = session?.user?.email;
 
   const orderDoc = await Order.create({
     userEmail,
+    ...address,
     cartProducts,
     paid: false, 
     orderNumber: await generateOrderNumber(),
@@ -51,7 +51,12 @@ module.exports = generateOrderNumber;
           .find(extra => extra._id.toString() === cartProductExtraThing._id.toString());
         productPrice += extraThingInfo.price;
       }
-  }  
+      if (userPoints >= productInfoPoints) {
+        // Sufficient points, deduct points from the user's account
+        updateUserPoints(userId, userPoints - orderAmount);
+        res.status(200).json({ success: true });
+      } 
+  }   
 
     const productName = cartProduct.name;
 
