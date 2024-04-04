@@ -42,15 +42,6 @@ export default function CartPage() {
     subtotal += cartProductPrice(p);
     subtotal2 += cartProductPrice2(p);
   }
-  const handleCheckout = async () => {
-    const response = await fetch('/api/create-checkout-session', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ amount: 0 }), // Specify 0 EUR amount
-    });
-  }
   async function proceedToCheckout(ev) {
     ev.preventDefault();
     // address and shopping cart products
@@ -59,7 +50,6 @@ export default function CartPage() {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
         body: JSON.stringify({
-          address,
           cartProducts,
         }),
       }).then(async (response) => {
