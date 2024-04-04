@@ -3,6 +3,7 @@ import {MenuItem} from "@/models/MenuItem";
 import {Order} from "@/models/Order";
 import mongoose from "mongoose";
 import {getServerSession} from "next-auth";
+import {UserInfo} from "@/models/UserInfo";
 const stripe = require('stripe')(process.env.STRIPE_SK);
 
 
@@ -21,9 +22,11 @@ export async function POST(req) {
 }
 module.exports = generateOrderNumber;
 
+
   const {cartProducts, address} = await req.json();
   const session = await getServerSession(authOptions);
   const userEmail = session?.user?.email;
+
 
   const orderDoc = await Order.create({
     userEmail,
@@ -51,6 +54,11 @@ module.exports = generateOrderNumber;
           .find(extra => extra._id.toString() === cartProductExtraThing._id.toString());
         productPrice += extraThingInfo.price;
       }
+
+  }   
+  if (UserInfo?.points>= productInfoPoints) {
+    // Sufficient points, deduct points from the user's account
+    updateUserPoints(userId, points - orderAmount);
   } 
 
     const productName = cartProduct.name;
@@ -71,7 +79,6 @@ module.exports = generateOrderNumber;
     line_items: stripeLineItems,
     mode: 'payment',
     customer_email: userEmail,
-
     success_url: process.env.NEXTAUTH_URL + 'orders/' + orderDoc._id.toString() + '?clear-cart=1',
     cancel_url: process.env.NEXTAUTH_URL + 'cart?canceled=1',
     metadata: {orderId:orderDoc._id.toString()},
