@@ -4,7 +4,7 @@ export default function Hero2() {
         <div className="py-8 md:py-12">
           <h1 className="text-4xl font-semibold">
           Your 
-          tea&nbsp;
+         bubble tea&nbsp;
           <span className="text-primary">
             bestie
           </span>

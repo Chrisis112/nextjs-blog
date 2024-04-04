@@ -4,14 +4,14 @@ export default function Hero() {
     <div  >
     <section  className="hero md:mt-4">
       <div className="py-8 md:py-12">
-        <h1 className="text-4xl font-semibold">
+        <h2 className="text-4xl font-semibold">
         Where
         your
         tea journey&nbsp;
           <span className="text-primary">
           begins 
           </span>
-        </h1>
+        </h2>
        
       </div>
       {/* <div className="relative hidden md:block">
