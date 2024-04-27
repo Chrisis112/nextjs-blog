@@ -46,7 +46,7 @@ export default function Home() {
       </section>
       <section className="text-center my-8" id="contact">
         <SectionHeaders
-          mainHeader={'Võtke meiega ühendust'}
+          mainHeader={'Kontakt'}
         />
         <div className="mt-4">
           <a className="text-2xl underline text-gray-500" href="tel:+372 5665 0230">
