@@ -20,6 +20,18 @@ export default function Home() {
       <Hero />
       <HomeMenu />
       <section className="text-center my-16" id="about">
+      <SectionHeaders
+          subHeader={'Meie edu lugu'}
+          mainHeader={'Meist'}
+        />
+        <div className="text-gray-500 max-w-md mx-auto mt-4 flex flex-col gap-4">
+          <p>
+          Meie eesmärk on tuua Eestisse Hiina maitse läbi meie maitsvate mulliteede. Meie teekond sai alguse armastusest autentsete koostisosade vastu ja soovist jagada Aasias elu jooksul avastatud erilisi maitseid. Meie omanik elas aastaid Hiinas, nautides autentse Aasia kultuuri ja maitseid.
+          </p>
+          <p>Me kõik tegeleme siin uurimisega. Maitsete segamine ja sobitamine, uute kombinatsioonide avastamine on see, mis meid iga päev elevil ja inspireerituna hoiab. Ja loomulikult kasutame ainult originaal koostisosi, sest usume, et pakume oma klientidele parimat.</p>
+          <p>Nii et olenemata sellest, kas ihaldate klassikalist mulliteed või tunnete end seiklushimulisena ja soovite proovida midagi uut, oleme teiega seotud. Tulge meiega sellel maitsval teekonnal ja uurige koos maitseid, üks lonks korraga!</p>
+        </div>
+     <br></br>
         <SectionHeaders
           subHeader={'Our story'}
           mainHeader={'About us'}
@@ -34,8 +46,7 @@ export default function Home() {
       </section>
       <section className="text-center my-8" id="contact">
         <SectionHeaders
-          subHeader={'Don\'t hesitate'}
-          mainHeader={'Contact us'}
+          mainHeader={'Võtke meiega ühendust'}
         />
         <div className="mt-4">
           <a className="text-2xl underline text-gray-500" href="tel:+372 5665 0230">
