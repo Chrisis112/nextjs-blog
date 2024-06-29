@@ -77,10 +77,10 @@ export default function Header() {
         <div
           onClick={() => setMobileNavOpen(false)}
           className="md:hidden p-4 bg-gray-200 rounded-lg mt-2 flex flex-col gap-2 text-center">
-          <Link href={'/'}>Home</Link>
-          <Link href={'/menu'}>Menu</Link>
-          <Link href={'/#about'}>About</Link>
-          <Link href={'/#contact'}>Contact</Link>
+          <Link href={'/'}>Esileht</Link>
+          <Link href={'/menu'}>Menüü</Link>
+          <Link href={'/#about'}>Meist</Link>
+          <Link href={'/#contact'}>Kontakt</Link>
         
           <AuthLinks status={status} userName={userName} />
         </div>
@@ -90,10 +90,10 @@ export default function Header() {
           <Link className="text-primary font-semibold text-2xl" href={'/'}>
           <Image src={'/logo123.png'} width={100} height={180}  alt={'sallad'} />
           </Link>
-          <Link href={'/'}>Home</Link>
-          <Link href={'/menu'}>Menu</Link>
-          <Link href={'/#about'}>About</Link>
-          <Link href={'/#contact'}>Contact</Link>
+          <Link href={'/'}>Esileht</Link>
+          <Link href={'/menu'}>Menüü</Link>
+          <Link href={'/#about'}>Meist</Link>
+          <Link href={'/#contact'}>Kontakt</Link>
           <div className="hidden md:flex items-center justify-between gap-3">
           
           
