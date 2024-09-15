@@ -38,6 +38,7 @@ export default function EditableImage({link, setLink}) {
         <div className="text-center bg-gray-200 p-4 text-gray-500 rounded-lg mb-1">
           No image
         </div>
+       <h1>for best image quality pleace use photo resalution 2848 x 4288</h1>
       )}
       <label>
         <input type="file" className="hidden" onChange={handleFileChange} />
