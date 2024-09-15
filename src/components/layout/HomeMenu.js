@@ -3,7 +3,6 @@ import SectionHeaders from "@/components/layout/SectionHeaders";
 import MenuItem from "@/components/menu/MenuItem";
 import Image from "next/legacy/image";
 import {useEffect, useState} from "react";
-import Link from "next/link";
 
 export default function HomeMenu() {
   const [bestSellers, setBestSellers] = useState([]);
@@ -27,7 +26,7 @@ export default function HomeMenu() {
       <div className="text-center mb-4">
         <SectionHeaders
           subHeader={'check out'}
-          mainHeader= <Link href= "/menu">{'Our Best Sellers'} </Link>
+          mainHeader= {'Our Best Sellers'} />
       </div>
       <div className="grid sm:grid-cols-3 gap-4">
         {bestSellers?.length > 0 && bestSellers.map(item => (
