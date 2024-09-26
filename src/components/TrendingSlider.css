@@ -59,9 +59,10 @@
 }
 @keyframes  scroll {
 	from {
-		transform: translateX(0);
+                transform: translateX(calc(10px * 50));
 	}
 	to {
-		transform: translateX(calc(-150px * 5));
+		transform: translateX(calc(-10px * 100));
 	}
+}
 }
