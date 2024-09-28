@@ -48,6 +48,16 @@ export default function Home() {
         <SectionHeaders
           mainHeader={'Kontakt'}
         />
+            <div className="mt-2">
+          <a className="text-2xl text-gray-500">
+          NaiChai OÜ(16827724)
+        </a>
+        </div>
+            <div className="mt-2">
+          <a className="text-2xl text-gray" >
+          KMKR:EE102661046
+        </a>
+        </div>
         <div className="mt-4">
           <a className="text-2xl underline text-gray-500" href="tel:+372 5665 0230">
             +372 5665 0230
