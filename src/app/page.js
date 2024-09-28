@@ -54,7 +54,7 @@ export default function Home() {
         </a>
         </div>
             <div className="mt-2">
-          <a className="text-2xl text-gray" >
+          <a className="text-2xl text-gray_500" >
           KMKR:EE102661046
         </a>
         </div>
