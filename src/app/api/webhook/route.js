@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { Order } from "@/models/Order";
 import { UserInfo } from "@/models/UserInfo";
 import Pusher from 'pusher';
+import admin from 'firebase-admin';
 
 const pusher = new Pusher({
   appId: process.env.PUSHER_APP_ID,
@@ -11,10 +12,48 @@ const pusher = new Pusher({
   useTLS: true,
 });
 
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+    }),
+  });
+}
+
 const stripe = require('stripe')(process.env.STRIPE_SK);
 
+async function sendFirebaseNotifications(order, tokens) {
+  if (!tokens?.length) return;
+
+  const message = {
+    notification: {
+      title: 'Новый заказ',
+      body: `Заказ №${order.orderNumber} ожидает обработки`,
+    },
+    tokens: tokens,
+    data: {
+      orderId: order._id.toString(),
+    },
+  };
+
+  try {
+    const response = await admin.messaging().sendMulticast(message);
+    console.log(`Firebase push sent: ${response.successCount} messages sent successfully.`);
+    if (response.failureCount > 0) {
+      response.responses.forEach((resp, idx) => {
+        if (!resp.success) {
+          console.error(`Failed to send to token ${tokens[idx]}:`, resp.error);
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Error sending Firebase push:', error);
+  }
+}
+
 export async function POST(req) {
-  // Подключаемся к MongoDB, если еще не подключены
   if (mongoose.connection.readyState !== 1) {
     await mongoose.connect(process.env.MONGO_URL);
   }
@@ -59,7 +98,7 @@ export async function POST(req) {
 
     if (isPaid) {
       await Order.updateOne({ _id: orderId }, { paid: true });
-      const updatedUser = await UserInfo.findOneAndUpdate(
+      await UserInfo.findOneAndUpdate(
         { _id: user._id },
         { $inc: { points: pointsEarned } },
         { new: true }
@@ -73,6 +112,11 @@ export async function POST(req) {
       } catch (err) {
         console.error('Pusher trigger error:', err);
       }
+
+      const sellers = await UserInfo.find({ seller: true, fcmTokens: { $exists: true, $ne: [] } });
+      const allFcmTokens = sellers.flatMap(seller => seller.fcmTokens || []);
+
+      await sendFirebaseNotifications(updatedOrder, allFcmTokens);
     }
   }
 
