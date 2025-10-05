@@ -1,12 +1,11 @@
 import mongoose from 'mongoose';
 import { MenuItem } from '@/models/MenuItem';
 
-export async function GET(req) {
+export async function GET(request, { params }) {
   if (mongoose.connection.readyState !== 1) {
     await mongoose.connect(process.env.MONGO_URL);
   }
 
-  const { params } = req;
   const id = params.id;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
