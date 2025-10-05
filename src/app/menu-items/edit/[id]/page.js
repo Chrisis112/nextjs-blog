@@ -18,15 +18,14 @@ export default function EditMenuItemPage() {
   const [redirectToItems, setRedirectToItems] = useState(false);
   const {loading, data} = useProfile();
 
-  useEffect(() => {
-    fetch('/api/menu-items').then(res => {
-      res.json().then(items => {
-        const item = items.find(i => i._id === id);
-        setMenuItem(item);
-        
-      });
-    })
-  },);
+useEffect(() => {
+  fetch('/api/menu-items').then(res => {
+    res.json().then(items => {
+      const item = items.find(i => i._id === id);
+      setMenuItem(item);
+    });
+  });
+}, [id]); // <- зависит от id
 
   async function handleFormSubmit(ev, data) {
     ev.preventDefault();
