@@ -2,29 +2,28 @@ import ChevronDown from "@/components/icons/ChevronDown";
 import ChevronUp from "@/components/icons/ChevronUp";
 import Plus from "@/components/icons/Plus";
 import Trash from "@/components/icons/Trash";
-import {useState} from "react";
+import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 
-export default function MenuItemPriceProps({name,addLabel,props,setProps}) {
-
+export default function MenuItemPriceProps({ name, addLabel, props, setProps }) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   function addProp() {
-    setProps(oldProps => {
-      return [...oldProps, {name:'', price:0}];
-    });
+    setProps(oldProps => [...oldProps, { name: '', price: 0 }]);
   }
 
   function editProp(ev, index, prop) {
     const newValue = ev.target.value;
-    setProps(prevSizes => {
-      const newSizes = [...prevSizes];
-      newSizes[index][prop] = newValue;
-      return newSizes;
+    setProps(prevProps => {
+      const newProps = [...prevProps];
+      newProps[index][prop] = newValue;
+      return newProps;
     });
   }
 
   function removeProp(indexToRemove) {
-    setProps(prev => prev.filter((v,index) => index !== indexToRemove));
+    setProps(prev => prev.filter((_, index) => index !== indexToRemove));
   }
 
   return (
@@ -32,50 +31,56 @@ export default function MenuItemPriceProps({name,addLabel,props,setProps}) {
       <button
         onClick={() => setIsOpen(prev => !prev)}
         className="inline-flex p-1 border-0 justify-start"
-        type="button">
-        {isOpen && (
-          <ChevronUp />
-        )}
-        {!isOpen && (
-          <ChevronDown />
-        )}
+        type="button"
+      >
+        {isOpen ? <ChevronUp /> : <ChevronDown />}
         <span>{name}</span>
         <span>({props?.length})</span>
       </button>
+
       <div className={isOpen ? 'block' : 'hidden'}>
-        {props?.length > 0 && props.map((size,index) => (
+        {props?.length > 0 && props.map((size, index) => (
           <div key={index} className="flex items-end gap-2">
             <div>
-              <label>Name</label>
-              <input type="text"
-                     placeholder="Size name"
-                     value={size.name}
-                     onChange={ev => editProp(ev, index, 'name')}
+              <label>{t('menuItemPrice.nameLabel')}</label>
+              <input
+                type="text"
+                placeholder={t('menuItemPrice.sizePlaceholder')}
+                value={size.name}
+                onChange={ev => editProp(ev, index, 'name')}
               />
             </div>
-            
+
             <div>
-              <label>Extra price</label>
-              <input type="text" placeholder="Extra price"
-                     value={size.price}
-                     onChange={ev => editProp(ev, index, 'price')}
+              <label>{t('menuItemPrice.priceLabel')}</label>
+              <input
+                type="text"
+                placeholder={t('menuItemPrice.pricePlaceholder')}
+                value={size.price}
+                onChange={ev => editProp(ev, index, 'price')}
               />
             </div>
+
             <div>
-              <button type="button"
-                      onClick={() => removeProp(index)}
-                      className="bg-white mb-2 px-2">
+              <button
+                type="button"
+                onClick={() => removeProp(index)}
+                className="bg-white mb-2 px-2"
+                aria-label={t('menuItemPrice.removeLabel')}
+              >
                 <Trash />
               </button>
             </div>
           </div>
         ))}
+
         <button
           type="button"
           onClick={addProp}
-          className="bg-white items-center">
+          className="bg-white items-center flex gap-2 p-2 mt-2"
+        >
           <Plus className="w-4 h-4" />
-          <span>{addLabel}</span>
+          <span>{addLabel || t('menuItemPrice.addLabel')}</span>
         </button>
       </div>
     </div>

@@ -1,11 +1,13 @@
 'use client';
 import AddressInputs from "@/components/layout/AddressInputs";
 import EditableImage from "@/components/layout/EditableImage";
-import {useProfile} from "@/components/UseProfile";
-import {useState, useEffect} from "react";
+import { useProfile } from "@/components/UseProfile";
+import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 
+export default function UserForm({ user, onSave }) {
+  const { t } = useTranslation();
 
-export default function UserForm({user,onSave}) {
   const [userName, setUserName] = useState(user?.name || '');
   const [image, setImage] = useState(user?.image || '');
   const [phone, setPhone] = useState(user?.phone || '');
@@ -15,8 +17,7 @@ export default function UserForm({user,onSave}) {
   const [country, setCountry] = useState(user?.country || '');
   const [admin, setAdmin] = useState(user?.admin || false);
   const [seller, setSeller] = useState(user?.seller || false);
-  const {data:loggedInUserData} = useProfile();
- 
+  const { data: loggedInUserData } = useProfile();
 
   function handleAddressChange(propName, value) {
     if (propName === 'phone') setPhone(value);
@@ -25,9 +26,8 @@ export default function UserForm({user,onSave}) {
     if (propName === 'city') setCity(value);
     if (propName === 'country') setCountry(value);
   }
-  
+
   return (
-    
     <div className="md:flex gap-4">
       <div>
         <div className="p-2 rounded-lg relative max-w-[120px]">
@@ -38,50 +38,49 @@ export default function UserForm({user,onSave}) {
         className="grow"
         onSubmit={ev =>
           onSave(ev, {
-            name:userName, image, phone, admin, seller,
+            name: userName, image, phone, admin, seller,
             streetAddress, city, country, postalCode,
           })
         }
       >
-        <label>
-          First and last name
-        </label>
+        <label>{t('userForm.nameLabel')}</label>
         <input
-          type="text" placeholder="First and last name"
+          type="text"
+          placeholder={t('userForm.namePlaceholder')}
           value={userName} onChange={ev => setUserName(ev.target.value)}
         />
-        
+
         <AddressInputs
-          addressProps={{phone, streetAddress, postalCode, city, country}}
+          addressProps={{ phone, streetAddress, postalCode, city, country }}
           setAddressProp={handleAddressChange}
         />
+
         <span>
-            Your bonus points: {loggedInUserData?.points}
-            </span>
-        {loggedInUserData.admin && (
+          {t('userForm.bonusPoints')}: {loggedInUserData?.points}
+        </span>
+
+        {loggedInUserData?.admin && (
           <div>
             <label className="p-2 inline-flex items-center gap-2 mb-2" htmlFor="adminCb">
               <input
-                id="adminCb" type="checkbox" className="" value={'1'}
+                id="adminCb" type="checkbox" value={'1'}
                 checked={admin}
                 onChange={ev => setAdmin(ev.target.checked)}
               />
-              <span>Admin</span>
+              <span>{t('userForm.admin')}</span>
             </label>
             <label className="p-2 inline-flex items-center gap-2 mb-2" htmlFor="sellerCb">
               <input
-                id="sellerCb" type="checkbox" className="" value={'1'}
+                id="sellerCb" type="checkbox" value={'1'}
                 checked={seller}
                 onChange={ev => setSeller(ev.target.checked)}
               />
-              <span>Seller</span>
-              
+              <span>{t('userForm.seller')}</span>
             </label>
           </div>
-          
         )}
-        
-        <button type="submit">Save</button>
+
+        <button type="submit">{t('userForm.save')}</button>
       </form>
     </div>
   );

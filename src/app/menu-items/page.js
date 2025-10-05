@@ -26,6 +26,12 @@ export default function MenuItemsPage() {
   if (!data.admin) {
     return 'Not an admin.';
   }
+  const getLocalizedText = (field) => {
+  if (!field) return '';
+  return typeof field === 'string'
+    ? field
+    : (field.ru || field.en || field.et || '');
+};
 
   return (
     <section className="mt-8 max-w-2xl mx-auto">
@@ -52,9 +58,9 @@ export default function MenuItemsPage() {
                   className="rounded-md"
                   src={item.image} alt={''} width={200} height={200} />
               </div>
-              <div className="text-center">
-                {item.name}
-              </div>
+<div className="text-center">
+  {getLocalizedText(item.name)}
+</div>
             </Link>
           ))}
         </div>

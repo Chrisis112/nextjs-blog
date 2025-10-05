@@ -1,41 +1,47 @@
-import {cartProductPrice} from "@/components/AppContext";
+import { cartProductPrice } from "@/components/AppContext";
 import Trash from "@/components/icons/Trash";
 import Image from "next/image";
+import { useTranslation } from "react-i18next";
 
-export default function CartProduct({product,onRemove}) {
+export default function CartProduct({ product, onRemove }) {
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language || 'ru';
+
+  const getLocalizedText = (field) => {
+    if (!field) return '';
+    return typeof field === 'string' ? field : (field[currentLang] || field['ru'] || '');
+  };
+
   return (
     <div className="flex items-center gap-4 border-b py-4">
       <div className="w-24">
-        <Image width={240} height={240} src={product.image} alt={''} />
+        <Image width={240} height={240} src={product.image} alt={getLocalizedText(product.name)} />
       </div>
       <div className="grow">
-        <h3 className="font-semibold">
-          {product.name}
-        </h3>
+        <h3 className="font-semibold">{getLocalizedText(product.name)}</h3>
         {product.size && (
           <div className="text-sm">
-            Size: <span>{product.size.name}</span>
+            {t('cartProduct.size')} <span>{getLocalizedText(product.size.name)}</span>
           </div>
         )}
         {product.temperature && (
           <div className="text-sm">
-            Temperature: <span>{product.temperature.name}</span>
+            {t('cartProduct.temperature')} <span>{getLocalizedText(product.temperature.name)}</span>
           </div>
         )}
         {product.extras?.length > 0 && (
           <div className="text-sm text-gray-500">
             {product.extras.map(extra => (
-              <div key={extra.name}>{extra.name} €{extra.price}</div>
+              <div key={getLocalizedText(extra.name)}>
+                {getLocalizedText(extra.name)} €{extra.price}
+              </div>
             ))}
           </div>
         )}
       </div>
       <div className="text-lg font-semibold">
-      €{cartProductPrice(product)}
+        €{cartProductPrice(product)}
       </div>
-      
-        
-      
     </div>
   );
 }

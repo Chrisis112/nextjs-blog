@@ -1,30 +1,107 @@
-'use client';
-import {CartContext} from "@/components/AppContext";
+import { CartContext } from "@/components/AppContext";
 import Bars2 from "@/components/icons/Bars2";
 import ShoppingCart from "@/components/icons/ShoppingCart";
-import {signOut, useSession} from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import {useContext, useState} from "react";
+import { useContext, useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useTranslation } from 'react-i18next';
+import Flag from "react-world-flags";
 
-function AuthLinks({status, userName}) {
-  const {locale, locales, push} = useRouter ()
+const flags = {
+  ru: 'RU',
+  en: 'GB',
+  et: 'EE',
+};
 
-  const handleClick = l => () => {}
+function LanguageSwitcher({ large = false }) {
+  const { i18n } = useTranslation();
+  const [lang, setLang] = useState(i18n.language || 'en');
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const flagWidth = large ? 48 : 24;
+  const flagHeight = large ? 32 : 16;
+  const btnPadding = large ? 'p-2' : 'p-1';
+  const fontSize = large ? 'text-lg' : 'text-base';
+
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+    setLang(lng);
+    setOpen(false);
+  };
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  return (
+    <div className="relative inline-block" ref={dropdownRef}>
+<button
+  onClick={() => setOpen(!open)}
+  aria-haspopup="true"
+  aria-expanded={open}
+  className={`flex items-center gap-2 border rounded ${btnPadding} shrink-0`}  // <- добавьте shrink-0
+>
+  <Flag
+    code={flags[lang]}
+    style={{
+      width: flagWidth,
+      height: flagHeight,
+      minWidth: flagWidth,
+      minHeight: flagHeight,
+      borderRadius: 3,
+      display: 'block'
+    }}
+  />
+</button>
+
+      {open && (
+        <div
+          className={`absolute mt-2 bg-white border rounded shadow-lg z-50 ${large ? "w-36" : "w-28"} `}
+          style={{ marginLeft: '-8px', padding: large ? 8 : undefined }}
+          role="menu"
+          aria-orientation="vertical"
+          aria-label="Language selector"
+        >
+          {Object.entries(flags).map(([lng, countryCode]) => (
+            <button
+              key={lng}
+              onClick={() => changeLanguage(lng)}
+              className={`w-full text-left ${fontSize} p-2 flex items-center gap-4 hover:bg-gray-100 ${
+                lang === lng ? 'bg-gray-200 font-semibold' : ''
+              }`}
+              role="menuitem"
+            >
+              <Flag code={countryCode} style={{ width: flagWidth, height: flagHeight, borderRadius: 3 }} />
+              <span className={`capitalize ${fontSize}`}>{lng}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AuthLinks({ status, userName }) {
+  const { t } = useTranslation();
+  // ...
   if (status === 'authenticated') {
     return (
       <>
-      <Link href= "/">EN</Link>
-          {/* <Link href= "est">EE</Link>
-          <Link href= "ru">RU</Link> */}
         <Link href={'/profile'} className="whitespace-nowrap">
-          Hello, {userName} {locale}
+          {t('nav.hello', { name: userName })}
         </Link>
-        <button
-          onClick={() => signOut()}
-          className="bg-primary rounded-full text-white px-8 py-2">
-          Logout
+        <button onClick={() => signOut()} className="bg-primary rounded-full text-white px-8 py-2">
+          {t('nav.logout')}
         </button>
       </>
     );
@@ -32,43 +109,51 @@ function AuthLinks({status, userName}) {
   if (status === 'unauthenticated') {
     return (
       <>
-        <Link className="bg-primary rounded-full text-white px-8 py-2" href={'/login'}>Login</Link>
-
+        <Link className="bg-primary rounded-full text-white px-8 py-2" href={'/login'}>
+          {t('nav.login')}
+        </Link>
       </>
     );
   }
 }
 
 export default function Header() {
-
   const session = useSession();
   const status = session?.status;
   const userData = session.data?.user;
+    const { t } = useTranslation();
   let userName = userData?.name || userData?.email;
-  const {cartProducts} = useContext(CartContext);
+  const { cartProducts } = useContext(CartContext);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   if (userName && userName.includes(' ')) {
     userName = userName.split(' ')[0];
   }
-  console.log(session);
-  return (
-    <header className="border-b" >
-      <div  className=" flex underline items-center md:hidden justify-between">
-      <Link className="text-primary font-semibold text-2xl" href={'/'}>
-          <Image src={'/logo123.png'} width={100} height={180}  alt={'sallad'} />
-          </Link>
-        <div className="flex gap-8 items-center">
+
+return (
+    <header className="fixed top-0 left-0 right-0 bg-white shadow z-50 border-b h-16 flex items-center px-2">
+      {/* Mobile Header */}
+      <div className="flex items-center md:hidden justify-between w-full h-12">
+        <Link className="text-primary font-semibold text-2xl" href={'/'}>
+          <Image src={'/logo123.png'} width={40} height={30} alt={'logo'} />
+        </Link>
+        {/* Сделаем видимый и большой LanguageSwitcher */}
+        <div className="mr-2 flex items-center flex">
+          <LanguageSwitcher />
+        </div>
+        <div className="flex items-center gap-2 h-full">
           <Link href={'/cart'} className="relative">
-            <ShoppingCart />
+            <ShoppingCart style={{ width: 24, height: 24 }} />
             {cartProducts?.length > 0 && (
               <span className="absolute -top-2 -right-4 bg-primary text-white text-xs py-1 px-1 rounded-full leading-3">
-            {cartProducts.length}
-          </span>
+                {cartProducts.length}
+              </span>
             )}
           </Link>
           <button
-            className="p-1 border"
-            onClick={() => setMobileNavOpen(prev => !prev)}>
+            className="p-1 border ml-2"
+            style={{ minWidth: 28, minHeight: 28 }}
+            onClick={() => setMobileNavOpen((prev) => !prev)}
+          >
             <Bars2 />
           </button>
         </div>
@@ -76,40 +161,40 @@ export default function Header() {
       {mobileNavOpen && (
         <div
           onClick={() => setMobileNavOpen(false)}
-          className="md:hidden p-4 bg-gray-200 rounded-lg mt-2 flex flex-col gap-2 text-center">
-          <Link href={'/'}>Esileht</Link>
-          <Link href={'/menu'}>Menüü</Link>
-          <Link href={'/#about'}>Meist</Link>
-          <Link href={'/#contact'}>Kontakt</Link>
-        
+          className="absolute top-12 left-0 right-0 p-2 bg-gray-200 rounded-b-lg flex flex-col gap-2 text-center z-40"
+        >
+          {/* // LanguageSwitcher в меню по желанию */}
+          <div className="flex items-center justify-center" />
+          <Link href={'/'}>{t('nav.home')}</Link>
+          <Link href={'/menu'}>{t('nav.menu')}</Link>
+          <Link href={'/#about'}>{t('nav.about')}</Link>
+          <Link href={'/#contact'}>{t('nav.contact')}</Link>
           <AuthLinks status={status} userName={userName} />
         </div>
       )}
-      <div className="hidden md:flex items-center justify-between">
-        <nav className="flex items-center gap-8 text-gray-500 font-semibold">
+      {/* Desktop Header */}
+      <div className="hidden md:flex items-center justify-between w-full h-16">
+        <nav className="flex items-center gap-4 text-gray-500 font-semibold h-16">
           <Link className="text-primary font-semibold text-2xl" href={'/'}>
-          <Image src={'/logo123.png'} width={100} height={180}  alt={'sallad'} />
+            <Image src={'/logo123.png'} width={50} height={50} alt={'logo'} />
           </Link>
-          <Link href={'/'}>Esileht</Link>
-          <Link href={'/menu'}>Menüü</Link>
-          <Link href={'/#about'}>Meist</Link>
-          <Link href={'/#contact'}>Kontakt</Link>
-          <div className="hidden md:flex items-center justify-between gap-3">
-          
-          
-          </div>
+          <Link href={'/'}>{t('nav.home')}</Link>
+          <Link href={'/menu'}>{t('nav.menu')}</Link>
+          <Link href={'/#about'}>{t('nav.about')}</Link>
+          <Link href={'/#contact'}>{t('nav.contact')}</Link>
         </nav>
-        <nav className="flex items-center gap-4 text-gray-500 font-semibold">
+        <div className="flex items-center gap-4 h-16">
+          <LanguageSwitcher />
           <AuthLinks status={status} userName={userName} />
           <Link href={'/cart'} className="relative">
             <ShoppingCart />
             {cartProducts?.length > 0 && (
               <span className="absolute -top-2 -right-4 bg-primary text-white text-xs py-1 px-1 rounded-full leading-3">
-            {cartProducts.length}
-          </span>
+                {cartProducts.length}
+              </span>
             )}
           </Link>
-        </nav>
+        </div>
       </div>
     </header>
   );

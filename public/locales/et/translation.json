@@ -1,0 +1,198 @@
+{
+  "imageAlt": "Boba",
+  "about": {
+    "subHeader": "Meie edu lugu",
+    "mainHeader": "Meist",
+    "paragraph1": "Meie eesmärk on tuua Eestisse Hiina maitse läbi meie maitsvate mulliteede. Meie teekond sai alguse armastusest autentsete koostisosade vastu ja soovist jagada Aasias elu jooksul avastatud erilisi maitseid. Meie omanik elas aastaid Hiinas, nautides autentse Aasia kultuuri ja maitseid.",
+    "paragraph2": "Me kõik tegeleme siin uurimisega. Maitsete segamine ja sobitamine, uute kombinatsioonide avastamine on see, mis meid iga päev elevil ja inspireerituna hoiab. Ja loomulikult kasutame ainult originaal koostisosi, sest usume, et pakume oma klientidele parimat.",
+    "paragraph3": "Nii et olenemata sellest, kas ihaldate klassikalist mulliteed või tunnete end seiklushimulisena ja soovite proovida midagi uut, oleme teiega seotud. Tulge meiega sellel maitsval teekonnal ja uurige koos maitseid, üks lonks korraga!"
+  },
+  "contact": {
+    "mainHeader": "Kontakt",
+    "companyName": "NaiChai OÜ (16827724)",
+    "vat": "KMKR: EE102661046"
+  },
+    "nav": {
+    "home": "Esileht",
+    "menu": "Menüü",
+    "about": "Meist",
+    "contact": "Kontakt",
+    "language": "EE",
+    "hello": "Tere, {{name}}",
+    "logout": "Logi välja",
+    "login": "Logi sisse"
+  },
+    "form": {
+    "phone": "Telefon",
+    "phonePlaceholder": "Telefoninumber",
+    "street": "Aadress",
+    "streetPlaceholder": "Tänava aadress",
+    "postal": "Postiindeks",
+    "postalPlaceholder": "Postiindeks",
+    "city": "Linn",
+    "cityPlaceholder": "Linn",
+    "country": "Riik",
+    "countryPlaceholder": "Riik"
+  },
+    "editableImage": {
+    "uploading": "Laadimine...",
+    "uploadSuccess": "Laadimine lõpule viidud",
+    "uploadError": "Laadimisel ilmnes viga",
+    "noImage": "Pilt puudub",
+    "qualityInfo": "Parima kvaliteedi saamiseks kasutage foto resolutsiooni 2848 x 4288",
+    "changeImage": "Muuda pilti",
+    "avatarAlt": "avatari"
+  },
+    "hero": {
+    "part1": "Kus",
+    "part2": "su",
+    "part3": "tee teekond",
+    "part4": "algab"
+  },
+  "hero2": {
+    "part1": "Sinu tee",
+    "part2": "guru"
+},
+  "homeMenu": {
+    "subHeader": "vaata",
+    "mainHeader": "Meie populaarseimad tooted"
+  },
+    "menuItem": {
+    "name": "Toote nimi",
+    "description": "Kirjeldus",
+    "category": "Kategooria",
+    "basePrice": "Baashind",
+    "pricePoints": "Punktihind",
+    "sizes": "Suurused",
+    "addSize": "Lisa suurus",
+    "temperature": "Temperatuur",
+    "addTemperature": "Lisa temperatuur",
+    "extraIngredients": "Lisandid",
+    "addExtras": "Lisa hind lisanditele",
+    "save": "Salvesta",
+        "pickSize": "Vali suurus",
+    "selectTemperature": "Vali temperatuur",
+    "anyExtras": "Lisandid?",
+    "addToCartPrice": "Lisa korvi €{{price}}",
+    "cancel": "Tühista",
+        "editLanguage": "Keele",
+    "otherTranslations": "Teised tõlked",
+    "notTranslated": "Tõlkimata"
+  },
+    "menuItemPrice": {
+    "nameLabel": "Nimi",
+    "sizePlaceholder": "Suuruse nimi",
+    "priceLabel": "Lisa hind",
+    "pricePlaceholder": "Lisa hind",
+    "removeLabel": "Eemalda",
+    "addLabel": "Lisa"
+  },
+    "userForm": {
+    "nameLabel": "Ees- ja perekonnanimi",
+    "namePlaceholder": "Ees- ja perekonnanimi",
+    "bonusPoints": "Teie boonuspunktid",
+    "admin": "Administraator",
+    "seller": "Müüja",
+    "save": "Salvesta"
+},
+  "userTabs": {
+    "profile": "Profiil",
+    "orders": "Tellimused",
+    "categories": "Kategooriad",
+    "menuItems": "Menüü Toidud",
+    "users": "Kasutajad"
+  },
+    "layout": {
+    "copyright": "© 2025 Kõik õigused kaitstud",
+    "terms": "Kasutustingimused",
+    "privacy": "Privaatsuspoliitika"
+  },
+    "addToCart": {
+    "withoutOptions": "Lisa ostukorvi €{{price}}",
+    "fromPrice": "Lisa ostukorvi (alates €{{price}})"
+  },
+    "agreement": {
+    "paragraph1": "Meie eesmärk on tuua Eestisse Hiina maitse läbi meie maitsvate mulliteedega. Meie teekond algas armastusest autentsete koostisosade vastu ja soovist jagada erilisi maitseid, mida avastasime oma eluajal Aasias. Meie omanik veetis Hiinas palju aastaid, nautides autentse Aasia kultuuri ja maitseid.",
+    "paragraph2": "Meie jaoks on oluline avastusretked. Maitsete segamine ja sobitamine, uute kombinatsioonide leidmine hoiab meid iga päev põnevil ja inspireeritud. Loomulikult kasutame ainult originaalseid koostisosi, sest usume, et pakume oma klientidele parimat.",
+    "paragraph3": "Nii et olenemata sellest, kas otsite klassikalist mulliteed või soovite proovida midagi uut ja põnevat, meil on see olemas. Tulge ja liituge meiega sellel maitsval teekonnal, avastades maitseid lonksu haaval!"
+  },
+    "cartProduct": {
+    "size": "Suurus:",
+    "temperature": "Temperatuur:"
+  },
+    "deleteButton": {
+    "confirmMessage": "Kas olete kindel, et soovite kustutada?",
+    "cancel": "Tühista",
+    "confirmYes": "Jah, kustuta!"
+  },
+    "firebaseNotifications": {
+    "promptMessage": "Luba teavitusi, et sa ei jätaks maha uusi tellimusi",
+    "allow": "Luba"
+  },
+    "pusherNotifications": {
+    "newOrder": "Uus tellimus",
+    "accept": "Võta vastu"
+  },
+    "cartPage": {
+    "paymentFailed": "Makse ebaõnnestus 😔",
+    "preparingOrder": "Tellimuse ettevalmistamine...",
+    "redirectingPayment": "Suunan tasumisele...",
+    "errorOccurred": "Midagi läks valesti... Proovi hiljem uuesti",
+    "cart": "Ostukorv",
+    "cartEmpty": "Sinu ostukorv on tühi 😔",
+    "noProducts": "Ostukorvis pole tooteid",
+    "size": "Suurus",
+    "temperature": "Temperatuur",
+    "forPoints": "Punktide eest",
+    "removeProduct": "Eemalda toode",
+    "total": "Kokku",
+    "pay": "Maksa €{{price}}",
+    "payWithPoints": "Maksa punktidega {{points}}"
+  },
+    "categoriesPage": {
+    "loadingUserInfo": "Kasutaja info laadimine...",
+    "notAdmin": "Ei ole administraator",
+    "updatingCategory": "Kategooria uuendamine...",
+    "creatingCategory": "Uue kategooria loomine...",
+    "categoryUpdated": "Kategooria uuendatud",
+    "categoryCreated": "Kategooria loodud",
+    "error": "Viga, vabandust...",
+    "deleting": "Kustutamine...",
+    "deleted": "Kustutatud",
+    "updateCategory": "Uuenda kategooriat",
+    "newCategoryName": "Uue kategooria nimi",
+    "update": "Uuenda",
+    "create": "Loo",
+    "cancel": "Tühista",
+    "existingCategories": "Olemasolevad kategooriad",
+    "edit": "Muuda",
+    "delete": "Kustuta"
+  },
+    "loginPage": {
+    "login": "Logi sisse",
+    "emailPlaceholder": "e-post",
+    "passwordPlaceholder": "parool",
+    "loginButton": "Logi sisse",
+    "createAccount": "Loo konto"
+  },
+    "registerPage": {
+    "register": "Registreeru",
+    "userCreated": "Kasutaja loodud.",
+    "nowYouCan": "Nüüd saate",
+    "login": "Logi sisse",
+    "errorOccurred": "Tekkis tõrge.",
+    "tryAgainLater": "Palun proovige hiljem uuesti",
+    "emailPlaceholder": "e-post",
+    "passwordPlaceholder": "parool",
+    "agreeWith": "Nõustun",
+    "terms": "teenustingimustega",
+    "privacy": "privaatsuspoliitikaga",
+    "registerButton": "Registreeru",
+    "orLoginWithProvider": "või logi sisse teenusepakkujaga",
+    "googleAlt": "Google'i logo",
+    "signUpWithGoogle": "Sign up with Google",
+    "agreementNote": "Nupu vajutamisega nõustute tingimuste ja privaatsuspoliitikaga",
+    "existingAccount": "Juba olemasolev konto?",
+    "loginHere": "Logi sisse siit"
+  }
+}

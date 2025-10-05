@@ -1,6 +1,6 @@
 .wrapper {
 
-	height: 500px;
+	height: 400px;
 	overflow: hidden;
 	position: relative;
 	width: 100%;
@@ -15,6 +15,18 @@
 	height: 200px;
 	width: 200px;
 	z-index: 2;
+}
+.trending-fullscreen-wrapper {
+  width: 100vw;
+  height: 100vh;
+  min-height: 100svh; /* для мобильных браузеров */
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+
 }
 
 .wrapper:after {
@@ -41,6 +53,27 @@
 .wrapper .logo img {
 	height: 900px;
 }
+
+.trending-logo {
+  width: 60vw;
+  max-width: 700px;
+  min-width: 280px;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.trending-logo img {
+  width: 100%;
+  height: 60vh;
+  max-height: 600px;
+  object-fit: contain;
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+  background: #fff;
+}
+
 .firstImage {
   height: 100%;
   position: relative;

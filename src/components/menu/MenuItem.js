@@ -1,8 +1,10 @@
+'use client';
 import { CartContext } from "@/components/AppContext";
 import MenuItemTile from "@/components/menu/MenuItemTile";
 import Image from "next/legacy/image";
 import { useContext, useState } from "react";
 import { useProfile } from "@/components/UseProfile";
+import { useTranslation } from "react-i18next";
 
 export default function MenuItem(menuItem) {
   const {
@@ -15,6 +17,17 @@ export default function MenuItem(menuItem) {
   const [showPopup, setShowPopup] = useState(false);
   const { addToCart } = useContext(CartContext);
   const { data: profileData } = useProfile();
+  const { t, i18n } = useTranslation();
+
+  const currentLang = i18n.language || 'ru';
+
+  // Универсальная функция для вывода текста с учётом типа
+  const getLocalizedText = (field) => {
+    if (!field) return '';
+    return typeof field === 'string'
+      ? field
+      : (field[currentLang] || field['ru'] || '');
+  };
 
   async function handleAddToCartButtonClick() {
     const hasOptions = sizes.length > 0 || temperature.length > 0 || extraIngredientPrices.length > 0;
@@ -53,7 +66,6 @@ export default function MenuItem(menuItem) {
       selectedPoints += extra.price;
     }
   }
-
   return (
     <>
       {showPopup && (
@@ -78,17 +90,17 @@ export default function MenuItem(menuItem) {
               }}>
                 <Image
                   src={image || "/default-image.png"}
-                  alt={name}
+                  alt={getLocalizedText(name)}
                   layout="fill"
                   objectFit="cover"
                 />
               </div>
-              <h2 className="text-lg font-bold text-center mb-2">{name}</h2>
-              <p className="text-center text-gray-500 text-sm mb-2">{description}</p>
+              <h2 className="text-lg font-bold text-center mb-2">{getLocalizedText(name)}</h2>
+              <p className="text-center text-gray-500 text-sm mb-2">{getLocalizedText(description)}</p>
 
               {sizes?.length > 0 && (
                 <div className="py-2 w-full">
-                  <h3 className="text-center text-gray-700 mb-1">Pick your size</h3>
+                  <h3 className="text-center text-gray-700 mb-1">{t('menuItem.pickSize')}</h3>
                   {sizes.map(size => (
                     <label
                       key={size._id}
@@ -105,9 +117,10 @@ export default function MenuItem(menuItem) {
                   ))}
                 </div>
               )}
+
               {temperature?.length > 0 && (
                 <div className="py-2 w-full">
-                  <h3 className="text-center text-gray-700 mb-1">Select temperature</h3>
+                  <h3 className="text-center text-gray-700 mb-1">{t('menuItem.selectTemperature')}</h3>
                   {temperature.map(temp => (
                     <label
                       key={temp._id}
@@ -124,9 +137,10 @@ export default function MenuItem(menuItem) {
                   ))}
                 </div>
               )}
+
               {extraIngredientPrices?.length > 0 && (
                 <div className="py-2 w-full">
-                  <h3 className="text-center text-gray-700 mb-1">Any extras?</h3>
+                  <h3 className="text-center text-gray-700 mb-1">{t('menuItem.anyExtras')}</h3>
                   {extraIngredientPrices.map(extraThing => (
                     <label
                       key={extraThing._id}
@@ -147,13 +161,13 @@ export default function MenuItem(menuItem) {
                 className="primary w-full sticky bottom-2 mt-3 bg-indigo-600 text-white rounded py-2 hover:bg-indigo-700"
                 onClick={handleAddToCartButtonClick}
               >
-                Add to cart €{selectedPrice}
+                {t('menuItem.addToCartPrice', { price: selectedPrice })}
               </button>
               <button
                 className="mt-2 w-full py-2 text-gray-700 rounded border hover:bg-gray-200"
                 onClick={() => setShowPopup(false)}
               >
-                Cancel
+                {t('menuItem.cancel')}
               </button>
             </div>
           </div>

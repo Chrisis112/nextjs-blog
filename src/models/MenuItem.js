@@ -5,17 +5,23 @@ const ExtraPriceSchema = new Schema({
   price: Number,
 });
 
+const TranslationSchema = new Schema({
+  ru: String,
+  en: String,
+  et: String,
+}, { _id: false });
 
 const MenuItemSchema = new Schema({
-  image: {type: String},
-  name: {type: String},
-  description: {type: String},
-  category: {type: mongoose.Types.ObjectId},
-  basePrice: {type: Number},
-  sizes: {type:[ExtraPriceSchema]},
-  temperature: {type:[ExtraPriceSchema]},
-  extraIngredientPrices: {type:[ExtraPriceSchema]},
-  pricePoints: {type: Number}, 
-}, {timestamps: true});
+  image: { type: String },
+  name: { type: Schema.Types.Mixed }, // теперь поддерживает строку и объект
+  description: { type: Schema.Types.Mixed },
+  category: { type: mongoose.Types.ObjectId },
+  basePrice: { type: Number },
+  sizes: { type: [ExtraPriceSchema] },
+  temperature: { type: [ExtraPriceSchema] },
+  extraIngredientPrices: { type: [ExtraPriceSchema] },
+  pricePoints: { type: Number },
+}, { timestamps: true });
+
 
 export const MenuItem = models?.MenuItem || model('MenuItem', MenuItemSchema);

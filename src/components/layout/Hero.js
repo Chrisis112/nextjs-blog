@@ -1,23 +1,20 @@
+import { useTranslation } from 'react-i18next';
 
 export default function Hero() {
+  const { t } = useTranslation();
+
   return (
-    <div  >
-    <section  className="hero md:mt-4">
-      <div className="py-8 md:py-12">
-        <h2 className="text-4xl font-semibold">
-        Where
-        your
-        tea journey&nbsp;
-          <span className="text-primary">
-          begins 
-          </span>
-        </h2>
-       
-      </div>
-      {/* <div className="relative hidden md:block">
-       <Image src={'/pizza.png'} layout={'fill'} objectFit={'contain'} alt={'pizza'} />
-      </div> */}
-    </section>
+    <div>
+      <section className="hero md:mt-4 mb-12 gap-8 px-2">
+          <h2 className="text-4xl font-semibold">
+            {t('hero.part1')} <br />
+            {t('hero.part2')} <br />
+            {t('hero.part3')}&nbsp;
+            <span className="text-primary">
+              {t('hero.part4')}
+            </span>
+          </h2>
+      </section>
     </div>
   );
 }
