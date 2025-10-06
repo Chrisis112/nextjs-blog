@@ -4,7 +4,9 @@ import { toast, ToastContainer } from "react-toastify";
 import Pusher from "pusher-js";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from 'react-i18next';
-import { useRouter } from 'next/navigation';  // импорт навигатора
+import { useRouter } from 'next/navigation';
+import { getMessaging, onMessage } from 'firebase/messaging';
+import firebaseApp from '../../../firebaseConfig';
 
 export default function PusherOrderNotifications({ seller }) {
   const { t, i18n } = useTranslation();
@@ -33,7 +35,7 @@ export default function PusherOrderNotifications({ seller }) {
                 audio.pause();
                 audio.currentTime = 0;
                 closeToast();
-                router.push(`/orders/${order._id}`);  // переход на страницу заказа
+                router.push(`/orders/${order._id}`);
               }}
             >
               {t('pusherNotifications.accept')}
@@ -75,10 +77,21 @@ export default function PusherOrderNotifications({ seller }) {
       showPersistentSoundToast(data.order);
     });
 
+    // Firebase Messaging subscription for push notifications in foreground
+    const messaging = getMessaging(firebaseApp);
+    const unsubscribeFirebase = onMessage(messaging, (payload) => {
+      console.log('Firebase message received: ', payload);
+      showPersistentSoundToast({
+        _id: payload.data?.orderId || 'firebase',
+        cartProducts: [{ name: payload.notification?.title || 'Новый заказ' }]
+      });
+    });
+
     return () => {
       channel.unbind_all();
       channel.unsubscribe();
       pusher.disconnect();
+      unsubscribeFirebase();
     };
   }, [seller, router]);
 
