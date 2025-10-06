@@ -22,4 +22,6 @@ if (typeof window !== "undefined") {
   }
 }
 
+// Корректный экспорт — default и именованный
+export default app;
 export { messaging, getToken, onMessage };

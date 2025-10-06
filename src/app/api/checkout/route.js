@@ -5,19 +5,7 @@ import mongoose from "mongoose";
 import { getServerSession } from "next-auth";
 import { generateOrderNumber } from "../libs/orderUtils";
 import { UserInfo } from "@/models/UserInfo";
-import admin from 'firebase-admin';
 const stripe = require('stripe')(process.env.STRIPE_SK);
-
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-    }),
-  });
-}
-
 
 // Универсальная функция для вытягивания текста нужного языка из мультиязычного объекта или строки
 function getLocalizedText(field, currentLang = 'ru') {
@@ -25,35 +13,6 @@ function getLocalizedText(field, currentLang = 'ru') {
   return typeof field === 'string'
     ? field
     : (field[currentLang] || field['ru'] || '');
-}
-
-async function sendFirebaseNotifications(order, fcmTokens) {
-  if (!fcmTokens?.length) return;
-
-  const message = {
-    notification: {
-      title: 'Новый заказ',
-      body: `Заказ №${order.orderNumber} ожидает обработки`,
-    },
-    tokens: fcmTokens,
-    data: {
-      orderId: order._id.toString(),
-    },
-  };
-
-  try {
-    const response = await admin.messaging().sendMulticast(message);
-    console.log(`Firebase push sent: ${response.successCount} messages sent successfully.`);
-    if (response.failureCount > 0) {
-      response.responses.forEach((resp, idx) => {
-        if (!resp.success) {
-          console.error(`Failed to send to token ${message.tokens[idx]}:`, resp.error);
-        }
-      });
-    }
-  } catch (error) {
-    console.error('Error sending Firebase push:', error);
-  }
 }
 
 export async function POST(req) {
@@ -74,11 +33,6 @@ export async function POST(req) {
   });
 
   console.log('Order created:', orderDoc._id);
-
-  const sellers = await UserInfo.find({ seller: true, fcmTokens: { $exists: true, $ne: [] } });
-  const allFcmTokens = sellers.flatMap(seller => seller.fcmTokens || []);
-
-  await sendFirebaseNotifications(orderDoc, allFcmTokens);
 
   const stripeLineItems = [];
   const currentLang = 'ru';

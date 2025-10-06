@@ -4,18 +4,19 @@ import { toast, ToastContainer } from "react-toastify";
 import Pusher from "pusher-js";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from 'react-i18next';
-
-
-
+import { useRouter } from 'next/navigation';  // импорт навигатора
 
 export default function PusherOrderNotifications({ seller }) {
-    const { t, i18n } = useTranslation();
-    const getLocalizedText = (field) => {
-  if (!field) return '';
-  return typeof field === 'string' 
-    ? field 
-    : (field[i18n.language] || field['ru'] || '');
-};
+  const { t, i18n } = useTranslation();
+  const router = useRouter();
+
+  const getLocalizedText = (field) => {
+    if (!field) return '';
+    return typeof field === 'string' 
+      ? field 
+      : (field[i18n.language] || field['ru'] || '');
+  };
+
   function showPersistentSoundToast(order) {
     let audio = new Audio('/mixkit-bell-notification-933.wav');
     audio.loop = true;
@@ -24,7 +25,7 @@ export default function PusherOrderNotifications({ seller }) {
     toast(
       ({ closeToast }) => (
         <div>
-<div>{t('pusherNotifications.newOrder')} <b>{order.cartProducts.map(p => getLocalizedText(p.name)).join(', ')}</b></div>
+          <div>{t('pusherNotifications.newOrder')} <b>{order.cartProducts.map(p => getLocalizedText(p.name)).join(', ')}</b></div>
           <div style={{ marginTop: 12 }}>
             <button
               className="bg-green-600 text-white px-2 py-1 rounded"
@@ -32,9 +33,10 @@ export default function PusherOrderNotifications({ seller }) {
                 audio.pause();
                 audio.currentTime = 0;
                 closeToast();
+                router.push(`/orders/${order._id}`);  // переход на страницу заказа
               }}
             >
-{t('pusherNotifications.accept')}
+              {t('pusherNotifications.accept')}
             </button>
           </div>
         </div>
@@ -46,35 +48,30 @@ export default function PusherOrderNotifications({ seller }) {
           audio.pause();
           audio.currentTime = 0;
         }
-      });
+      }
+    );
   }
 
   useEffect(() => {
     if (!seller) return;
-    // Добавить отладку для подключения
-    Pusher.logToConsole = true;  // Включить логирование
+    Pusher.logToConsole = true;
 
     const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY, {
       cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
       forceTLS: true,
     });
 
-    // Слушать события подключения
-    pusher.connection.bind('connected', () => {
-    });
+    pusher.connection.bind('connected', () => {});
 
-    pusher.connection.bind('error', (error) => {
-    });
+    pusher.connection.bind('error', (error) => {});
 
     const channel = pusher.subscribe("orders-channel");
     
-    channel.bind('pusher:subscription_succeeded', () => {
-    });
+    channel.bind('pusher:subscription_succeeded', () => {});
 
-    channel.bind('pusher:subscription_error', (error) => {
-    });
+    channel.bind('pusher:subscription_error', (error) => {});
 
-    channel.bind("new-order", (data) => {
+    channel.bind("order-paid", (data) => {
       showPersistentSoundToast(data.order);
     });
 
@@ -83,7 +80,7 @@ export default function PusherOrderNotifications({ seller }) {
       channel.unsubscribe();
       pusher.disconnect();
     };
-  }, [seller]);
+  }, [seller, router]);
 
   return <ToastContainer position="top-right" />;
 }

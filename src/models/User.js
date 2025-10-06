@@ -7,6 +7,7 @@ const UserSchema = new Schema({
   image: {type: String},
   points: {type: Number, default: 0},
   agreement: {type: Boolean, default: false},
+    fcmTokens: { type: [String], default: [] }, // добавьте это поле!
 }, {timestamps: true});
 
 export const User = models?.User || model('User', UserSchema);

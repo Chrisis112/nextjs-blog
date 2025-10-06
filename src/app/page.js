@@ -1,84 +1,83 @@
 'use client';
 
+import { useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { getMessaging, getToken } from 'firebase/messaging';
+import firebaseApp from '../../firebaseConfig';
+
 import Hero from "@/components/layout/Hero";
 import HomeMenu from "@/components/layout/HomeMenu";
 import SectionHeaders from "@/components/layout/SectionHeaders";
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import TrendingSlider from "@/components/TrendingSlider";
 import Hero2 from "@/components/layout/Hero2";
 import Image from "next/image";
 import { useTranslation } from 'react-i18next';
 
 export default function Home() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const { data: session, status } = useSession();
 
+  useEffect(() => {
+    async function sendFcmToken() {
+      if (!session || !session.accessToken) return;
 
+      try {
+        const messaging = getMessaging(firebaseApp);
+        const VAPID_KEY = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
+         const token = await getToken(messaging, { vapidKey: VAPID_KEY });
+        if (token) {
+          await fetch('/api/save-fcm-token', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.accessToken}`,
+            },
+            body: JSON.stringify({ token }),
+          });
+          console.log('FCM token updated from Home page');
+        }
+      } catch (error) {
+        console.error('Failed to update FCM token from Home:', error);
+      }
+    }
 
+    if (status === 'authenticated') {
+      sendFcmToken();
+    }
+  }, [status, session]);
 
   return (
     <>
       <SpeedInsights/>
       <Hero2/>
-<div className="w-full flex flex-col sm:flex-row justify-center mb-12 items-center gap-4 px-2">
-  {/* Первый блок тоже обернут в crop-wrapper */}
-  <div   style={{
-    width: "300px",
-    height: "400px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  }}>
-    <Image
-      alt={t('imageAlt')}
-      width={350}
-      height={600}
-      priority
-    style={{
-      width: "100%",
-      height: "100%",
-      objectFit: "cover",
-      objectPosition: "bottom",
-      borderRadius: "16px"
-    }}
-      src="https://i.imgur.com/DL8lA2O.png"
-    />
-  </div>
-<div
-  style={{
-    width: "280px",
-    height: "280px",
-    overflow: "hidden",
-    borderRadius: "16px",
-    background: "#fff",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  }}
->
-  <Image
-    alt={t('imageAlt2')}
-    width={350}
-    height={600}
-    priority
-    style={{
-      width: "100%",
-      height: "100%",
-      objectFit: "cover",
-      objectPosition: "bottom",
-      borderRadius: "16px"
-    }}
-    src="/4.png"
-  />
-</div>
-</div>
+      <div className="w-full flex flex-col sm:flex-row justify-center mb-12 items-center gap-4 px-2">
+        <div style={{ width: "300px", height: "400px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <Image
+            alt={t('imageAlt')}
+            width={350}
+            height={600}
+            priority
+            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "bottom", borderRadius: "16px" }}
+            src="https://i.imgur.com/DL8lA2O.png"
+          />
+        </div>
+        <div style={{ width: "280px", height: "280px", overflow: "hidden", borderRadius: "16px", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <Image
+            alt={t('imageAlt2')}
+            width={350}
+            height={600}
+            priority
+            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "bottom", borderRadius: "16px" }}
+            src="/4.png"
+          />
+        </div>
+      </div>
       <TrendingSlider/>
       <Hero />
       <HomeMenu />
       <section className="text-center mt-10" id="about">
-        <SectionHeaders
-          subHeader={t('about.subHeader')}
-          mainHeader={t('about.mainHeader')}
-        />
+        <SectionHeaders subHeader={t('about.subHeader')} mainHeader={t('about.mainHeader')} />
         <div className="text-gray-500 max-w-md mx-auto mt-4 flex flex-col gap-4">
           <p>{t('about.paragraph1')}</p>
           <p>{t('about.paragraph2')}</p>

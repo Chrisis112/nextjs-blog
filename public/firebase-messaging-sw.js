@@ -11,14 +11,65 @@ firebase.initializeApp({
   measurementId: "G-H51N6EQPL0",
 });
 
+// Инициализация Firebase
+firebase.initializeApp(firebaseConfig);
+
 const messaging = firebase.messaging();
 
-messaging.onBackgroundMessage(function(payload) {
-  console.log('[firebase-messaging-sw.js] Received background message ', payload);
-  const notificationTitle = payload.notification.title;
-  const notificationOptions = {
-    body: payload.notification.body,
-    icon: '/naicahi.jpg'
-  };
-  self.registration.showNotification(notificationTitle, notificationOptions);
+const seenNotifications = new Set();
+
+// Обработка пуш-сообщений (event push)
+self.addEventListener('push', (event) => {
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
+      // Если хоть один клиент видим и активен - не показываем нотификацию, пуш обработаем в foreground
+      const isClientVisible = clientList.some(client => client.visibilityState === 'visible');
+      if (isClientVisible) {
+        console.log('[firebase-messaging-sw.js] Client visible - skip showing notification in SW');
+        return;
+      }
+
+      // Парсим payload из push события
+      const payload = event.data ? event.data.json() : {};
+
+      const notifId = payload.messageId || (payload.notification && payload.notification.tag);
+      if (notifId && seenNotifications.has(notifId)) {
+        console.log('[firebase-messaging-sw.js] Duplicate notification ignored:', notifId);
+        return;
+      }
+      if (notifId) {
+        seenNotifications.add(notifId);
+      }
+
+      const notificationTitle = payload.notification?.title || 'Уведомление';
+      const notificationOptions = {
+        body: payload.notification?.body || '',
+        icon: payload.notification?.icon || '/firebase-logo.png',
+        badge: payload.notification?.badge,
+        data: payload.data,
+      };
+
+      return self.registration.showNotification(notificationTitle, notificationOptions);
+    })
+  );
+});
+
+// Обработка клика по уведомлению
+self.addEventListener('notificationclick', function(event) {
+  event.notification.close();
+
+  const url = event.notification.data?.url || '/';
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+      for (const client of windowClients) {
+        if (client.url === url && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      if (clients.openWindow) {
+        return clients.openWindow(url);
+      }
+    })
+  );
 });

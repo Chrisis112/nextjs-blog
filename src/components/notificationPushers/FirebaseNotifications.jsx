@@ -1,11 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { messaging, getToken } from '../../../firebaseConfig';
+import { getMessaging, getToken } from 'firebase/messaging';
+import firebaseApp from '../../../firebaseConfig';
 import { useTranslation } from 'react-i18next';
+import { useSession } from 'next-auth/react';
 
 export default function FirebaseNotifications({ userSeller }) {
   const { t } = useTranslation();
+  const { data: session, status } = useSession();
 
   const [permissionRequested, setPermissionRequested] = useState(false);
   const [showPrompt, setShowPrompt] = useState(false);
@@ -22,31 +25,53 @@ export default function FirebaseNotifications({ userSeller }) {
     }
   }, [userSeller]);
 
+  async function sendTokenToServer(token) {
+    try {
+      if (!session || !session.accessToken) {
+        console.warn('No access token in session!');
+        return;
+      }
+      await fetch('/api/save-fcm-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.accessToken}`,
+        },
+        body: JSON.stringify({ token }),
+      });
+      console.log('FCM Token sent to server');
+    } catch (error) {
+      console.error('Error sending FCM token to server:', error);
+    }
+  }
+
   async function requestPermissionAndSubscribe() {
-    if (!messaging) {
-      console.warn('Firebase messaging не инициализирован');
+    if (!firebaseApp) {
+      console.warn('Firebase не инициализирован');
       return;
     }
 
     try {
       const permission = await Notification.requestPermission();
-      if (permission === 'granted') {
-        const token = await getToken(messaging, {
-          vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
-        });
-        console.log('FCM Token:', token);
-        // TODO: отправить token на сервер для сохранения
-        setPermissionRequested(true);
-        setShowPrompt(false);
-      } else {
-        console.warn('Пользователь отказал в уведомлениях');
-        setPermissionRequested(true);
-        setShowPrompt(false);
-      }
-    } catch (error) {
-      console.error('Ошибка получения разрешения', error);
       setPermissionRequested(true);
       setShowPrompt(false);
+
+      if (permission !== 'granted') {
+        console.log('Permission not granted for notifications');
+        return;
+      }
+
+      const messaging = getMessaging(firebaseApp);
+      const currentToken = await getToken(messaging, { vapidKey: 'YOUR_PUBLIC_VAPID_KEY' });
+
+      if (currentToken) {
+        console.log('FCM Token:', currentToken);
+        await sendTokenToServer(currentToken);
+      } else {
+        console.log('No registration token available. Request permission to generate one.');
+      }
+    } catch (err) {
+      console.log('An error occurred while retrieving token.', err);
     }
   }
 
@@ -58,14 +83,13 @@ export default function FirebaseNotifications({ userSeller }) {
         <p>{t('firebaseNotifications.promptMessage')}</p>
         <button onClick={requestPermissionAndSubscribe}>{t('firebaseNotifications.allow')}</button>
       </div>
-
       <style jsx>{`
         .notification-prompt {
           position: fixed;
           top: 10px;
           left: 10px;
-          background: #1e40af;
-          color: white;
+          background: #dde1eeff;
+          color: black;
           padding: 12px 20px;
           border-radius: 8px;
           box-shadow: 0 4px 12px rgba(0,0,0,0.15);
