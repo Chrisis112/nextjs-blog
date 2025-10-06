@@ -62,7 +62,8 @@ export default function FirebaseNotifications({ userSeller }) {
       }
 
       const messaging = getMessaging(firebaseApp);
-      const currentToken = await getToken(messaging, { vapidKey: 'YOUR_PUBLIC_VAPID_KEY' });
+              const VAPID_KEY = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
+      const currentToken = await getToken(messaging, { vapidKey: VAPID_KEY });
 
       if (currentToken) {
         console.log('FCM Token:', currentToken);
