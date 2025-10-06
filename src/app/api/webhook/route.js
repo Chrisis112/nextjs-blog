@@ -176,33 +176,20 @@ async function sendFirebaseNotifications(order, tokens) {
 }
 
 export async function POST(req) {
+  const sig = req.headers.get('stripe-signature');
+  let event;
+
   try {
-    if (mongoose.connection.readyState !== 1) {
-      await mongoose.connect(process.env.MONGO_URL);
-    }
-
-    const sig = req.headers.get("stripe-signature");
+    const reqBuffer = await req.text();
     const signSecret = process.env.STRIPE_SIGN_SECRET;
+    event = stripe.webhooks.constructEvent(reqBuffer, sig, signSecret);
+  } catch (e) {
+    console.error('stripe error');
+    return Response.json(e, {status: 400});
+    
+  }
 
-    // raw body в buffer для Stripe webhook
-const rawBody = await req.arrayBuffer();
-const reqBuffer = Buffer.from(rawBody);
-
-    let event;
-    try {
-      event = stripe.webhooks.constructEvent(reqBuffer, sig, signSecret);
-    } catch (e) {
-      console.error("Stripe webhook verification failed:", e.message);
-      return new Response(
-        JSON.stringify({ error: e.message }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-    }
-
-    if (event.type === "checkout.session.completed") {
+  if (event.type === 'checkout.session.completed') {
       const orderId = event?.data?.object?.metadata?.orderId;
       const isPaid = event?.data?.object?.payment_status === "paid";
       const userEmail = event?.data?.object?.customer_details?.email;
@@ -233,14 +220,11 @@ const reqBuffer = Buffer.from(rawBody);
       const paymentAmount = event?.data?.object?.amount_total / 100;
       const pointsEarned = Math.floor(paymentAmount);
 
-      if (isPaid) {
-        await Order.updateOne({ _id: orderId }, { paid: true });
-        await UserInfo.findOneAndUpdate(
-          { _id: user._id },
-          { $inc: { points: pointsEarned } },
-          { new: true }
-        );
-
+    if (isPaid) {
+      
+      await Order.updateOne({_id:orderId}, {paid:true});
+      await UserInfo.updateOne( {_id:user},{ $inc: { points: pointsEarned } }, { new: true });
+    }
         const updatedOrder = await Order.findById(orderId);
         console.log("Order updated successfully:", updatedOrder.orderNumber);
 
@@ -273,19 +257,8 @@ const reqBuffer = Buffer.from(rawBody);
           console.error("Error in Firebase notification process:", error);
         }
       }
-    }
 
-    return new Response(
-      JSON.stringify({ status: "ok" }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
-    );
-  } catch (error) {
-    console.error("Webhook processing error:", error);
-    return new Response(
-      JSON.stringify({ error: "Internal server error" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
-  }
+
+  return Response.json('ok', {status: 200});
+  
 }
-
-export const dynamic = "force-dynamic";
