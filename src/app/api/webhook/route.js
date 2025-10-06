@@ -181,9 +181,10 @@ export async function POST(req) {
     }
 
     if (event.type === 'checkout.session.completed') {
-      const orderId = event?.data?.object?.metadata?.orderId;
+      const orderId = event?.data?.object?.Id;
       const isPaid = event?.data?.object?.payment_status === 'paid';
-      const userEmail = event?.data?.object?.customer_email;
+const userEmail = event?.data?.object?.customer_details?.email;
+
 
       console.log('Processing checkout.session.completed:', { orderId, isPaid, userEmail });
 
