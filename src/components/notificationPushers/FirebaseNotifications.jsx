@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getMessaging, getToken } from 'firebase/messaging';
+import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import firebaseApp from '../../../firebaseConfig';
 import { useTranslation } from 'react-i18next';
 import { useSession } from 'next-auth/react';
@@ -12,6 +12,18 @@ export default function FirebaseNotifications({ userSeller }) {
 
   const [permissionRequested, setPermissionRequested] = useState(false);
   const [showPrompt, setShowPrompt] = useState(false);
+  const [messaging, setMessaging] = useState(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && firebaseApp) {
+      try {
+        const messagingInstance = getMessaging(firebaseApp);
+        setMessaging(messagingInstance);
+      } catch (error) {
+        console.error('Error initializing messaging:', error);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (!userSeller) return;
@@ -19,11 +31,50 @@ export default function FirebaseNotifications({ userSeller }) {
     if (Notification.permission === 'default') {
       setShowPrompt(true);
       setPermissionRequested(false);
-    } else {
+    } else if (Notification.permission === 'granted' && messaging) {
       setPermissionRequested(true);
       setShowPrompt(false);
+      initializeToken();
     }
-  }, [userSeller]);
+  }, [userSeller, messaging]);
+
+  // Обработка foreground уведомлений
+  useEffect(() => {
+    if (!messaging || !userSeller) return;
+
+    const unsubscribe = onMessage(messaging, (payload) => {
+      console.log('Foreground message received:', payload);
+      
+      if (Notification.permission === 'granted') {
+        new Notification(payload.notification?.title || 'Уведомление', {
+          body: payload.notification?.body || '',
+          icon: '/firebase-logo.png',
+          data: payload.data
+        });
+      }
+    });
+
+    return () => unsubscribe();
+  }, [messaging, userSeller]);
+
+  async function initializeToken() {
+    if (!messaging) return;
+
+    try {
+      const currentToken = await getToken(messaging, { 
+        vapidKey: 'BH8KgBCfJ5qU...' // ВАШ РЕАЛЬНЫЙ VAPID КЛЮЧ
+      });
+
+      if (currentToken) {
+        console.log('FCM Token:', currentToken);
+        await sendTokenToServer(currentToken);
+      } else {
+        console.log('No registration token available.');
+      }
+    } catch (err) {
+      console.log('An error occurred while retrieving token:', err);
+    }
+  }
 
   async function sendTokenToServer(token) {
     try {
@@ -31,7 +82,8 @@ export default function FirebaseNotifications({ userSeller }) {
         console.warn('No access token in session!');
         return;
       }
-      await fetch('/api/save-fcm-token', {
+      
+      const response = await fetch('/api/save-fcm-token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -39,7 +91,12 @@ export default function FirebaseNotifications({ userSeller }) {
         },
         body: JSON.stringify({ token }),
       });
-      console.log('FCM Token sent to server');
+
+      if (response.ok) {
+        console.log('FCM Token sent to server successfully');
+      } else {
+        console.error('Failed to send FCM token:', await response.text());
+      }
     } catch (error) {
       console.error('Error sending FCM token to server:', error);
     }
@@ -61,18 +118,9 @@ export default function FirebaseNotifications({ userSeller }) {
         return;
       }
 
-      const messaging = getMessaging(firebaseApp);
-              const VAPID_KEY = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
-      const currentToken = await getToken(messaging, { vapidKey: VAPID_KEY });
-
-      if (currentToken) {
-        console.log('FCM Token:', currentToken);
-        await sendTokenToServer(currentToken);
-      } else {
-        console.log('No registration token available. Request permission to generate one.');
-      }
+      await initializeToken();
     } catch (err) {
-      console.log('An error occurred while retrieving token.', err);
+      console.log('An error occurred while requesting permission:', err);
     }
   }
 
@@ -82,7 +130,9 @@ export default function FirebaseNotifications({ userSeller }) {
     <>
       <div className="notification-prompt">
         <p>{t('firebaseNotifications.promptMessage')}</p>
-        <button onClick={requestPermissionAndSubscribe}>{t('firebaseNotifications.allow')}</button>
+        <button onClick={requestPermissionAndSubscribe}>
+          {t('firebaseNotifications.allow')}
+        </button>
       </div>
       <style jsx>{`
         .notification-prompt {
