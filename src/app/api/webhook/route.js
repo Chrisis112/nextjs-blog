@@ -12,7 +12,7 @@ const pusher = new Pusher({
   useTLS: true,
 });
 
-// Проверяем наличие всех необходимых Firebase переменных
+// Проверяем Firebase переменные
 const requiredFirebaseEnvs = ['FIREBASE_PROJECT_ID', 'FIREBASE_CLIENT_EMAIL', 'FIREBASE_PRIVATE_KEY'];
 const missingEnvs = requiredFirebaseEnvs.filter(env => !process.env[env]);
 
@@ -26,21 +26,17 @@ if (missingEnvs.length > 0) {
   console.log('FIREBASE_PRIVATE_KEY preview:', process.env.FIREBASE_PRIVATE_KEY?.slice(0, 50));
 }
 
-// Инициализация Firebase Admin только если все переменные присутствуют
+// Инициализация Firebase Admin
 let firebaseInitialized = false;
 if (missingEnvs.length === 0 && !admin.apps.length) {
   try {
-    // Правильно обрабатываем private key
     let privateKey = process.env.FIREBASE_PRIVATE_KEY;
-    
-    // Если private key хранится в кавычках в .env файле, убираем их
     if (privateKey.startsWith('"') && privateKey.endsWith('"')) {
       privateKey = privateKey.slice(1, -1);
     }
-    
-    // Заменяем \\n на реальные переносы строк
+    // Исправленная замена экранированных переносов строки "\\n" на реальные "\n"
     privateKey = privateKey.replace(/\\n/g, '\n');
-    
+
     admin.initializeApp({
       credential: admin.credential.cert({
         projectId: process.env.FIREBASE_PROJECT_ID,
@@ -48,7 +44,6 @@ if (missingEnvs.length === 0 && !admin.apps.length) {
         privateKey: privateKey,
       }),
     });
-    
     firebaseInitialized = true;
     console.log('Firebase Admin initialized successfully');
   } catch (error) {
@@ -61,12 +56,12 @@ const stripe = require('stripe')(process.env.STRIPE_SK);
 
 async function sendFirebaseNotifications(order, tokens) {
   console.log('sendFirebaseNotifications called with', tokens.length, 'tokens');
-  
+
   if (!firebaseInitialized) {
     console.error('Firebase not initialized, skipping notifications');
     return;
   }
-  
+
   if (!tokens?.length) {
     console.log('No tokens provided, skipping notifications');
     return;
@@ -83,15 +78,12 @@ async function sendFirebaseNotifications(order, tokens) {
   };
 
   try {
-    // Проверяем доступность Firebase Messaging
     if (!admin.messaging) {
       console.error('Firebase messaging not available');
       return;
     }
 
-    // Фильтруем токены - убираем пустые и недействительные
     const validTokens = tokens.filter(token => token && typeof token === 'string' && token.trim().length > 0);
-    
     if (validTokens.length === 0) {
       console.log('No valid tokens found');
       return;
@@ -99,15 +91,12 @@ async function sendFirebaseNotifications(order, tokens) {
 
     console.log(`Sending to ${validTokens.length} valid tokens`);
 
-    // Используем sendEachForMulticast для лучшей обработки ошибок
     if (typeof admin.messaging().sendEachForMulticast === 'function') {
       const response = await admin.messaging().sendEachForMulticast({
         ...message,
         tokens: validTokens,
       });
-      
       console.log(`Firebase push sent: ${response.successCount} messages sent successfully.`);
-      
       if (response.failureCount > 0) {
         console.log(`${response.failureCount} messages failed to send`);
         response.responses.forEach((resp, idx) => {
@@ -121,9 +110,7 @@ async function sendFirebaseNotifications(order, tokens) {
         ...message,
         tokens: validTokens,
       });
-      
       console.log(`Firebase push sent: ${response.successCount} messages sent successfully.`);
-      
       if (response.failureCount > 0) {
         console.log(`${response.failureCount} messages failed to send`);
         response.responses.forEach((resp, idx) => {
@@ -133,16 +120,15 @@ async function sendFirebaseNotifications(order, tokens) {
         });
       }
     } else {
-      // Fallback - отправляем по одному
       console.log('Using individual send method');
       let successCount = 0;
       let failureCount = 0;
-      
+
       for (const token of validTokens) {
         try {
           await admin.messaging().send({
-             ...message,
-             token,
+            ...message,
+            token,
           });
           successCount++;
           console.log(`Firebase push sent to token: ${token.slice(0, 20)}...`);
@@ -151,7 +137,6 @@ async function sendFirebaseNotifications(order, tokens) {
           console.error(`Failed to send to token ${token.slice(0, 20)}...:`, err.code || err.message);
         }
       }
-      
       console.log(`Individual send completed: ${successCount} success, ${failureCount} failures`);
     }
   } catch (error) {
@@ -166,11 +151,13 @@ export async function POST(req) {
     }
 
     const sig = req.headers.get('stripe-signature');
-    let event;
+    const signSecret = process.env.STRIPE_SIGN_SECRET;
 
+    // Используем raw body для constructEvent
+    const reqBuffer = Buffer.from(await req.arrayBuffer());
+
+    let event;
     try {
-      const reqBuffer = await req.text();
-      const signSecret = process.env.STRIPE_SIGN_SECRET;
       event = stripe.webhooks.constructEvent(reqBuffer, sig, signSecret);
     } catch (e) {
       console.error('Stripe webhook verification failed:', e.message);
@@ -181,10 +168,9 @@ export async function POST(req) {
     }
 
     if (event.type === 'checkout.session.completed') {
-      const orderId = event?.data?.object?.Id;
+      const orderId = event?.data?.object?.metadata?.orderId;
       const isPaid = event?.data?.object?.payment_status === 'paid';
-const userEmail = event?.data?.object?.customer_details?.email;
-
+      const userEmail = event?.data?.object?.customer_details?.email;
 
       console.log('Processing checkout.session.completed:', { orderId, isPaid, userEmail });
 
@@ -219,7 +205,6 @@ const userEmail = event?.data?.object?.customer_details?.email;
         const updatedOrder = await Order.findById(orderId);
         console.log('Order updated successfully:', updatedOrder.orderNumber);
 
-        // Pusher уведомление
         try {
           await pusher.trigger('orders-channel', 'order-paid', { order: updatedOrder });
           console.log('Pusher notification sent successfully');
@@ -227,7 +212,6 @@ const userEmail = event?.data?.object?.customer_details?.email;
           console.error('Pusher notification failed:', err.message);
         }
 
-        // Firebase уведомления
         try {
           const sellers = await UserInfo.find({
             seller: true,
@@ -252,7 +236,6 @@ const userEmail = event?.data?.object?.customer_details?.email;
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
-
   } catch (error) {
     console.error('Webhook processing error:', error);
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
