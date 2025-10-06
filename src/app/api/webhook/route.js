@@ -97,7 +97,6 @@ async function sendFirebaseNotifications(order, tokens) {
       return;
     }
 
-    // Отфильтровываем корректные токены
     const validTokens = tokens.filter(
       (token) => token && typeof token === "string" && token.trim().length > 0
     );
@@ -107,55 +106,27 @@ async function sendFirebaseNotifications(order, tokens) {
     }
     console.log(`Sending to ${validTokens.length} valid tokens`);
 
+    let response;
     if (typeof admin.messaging().sendEachForMulticast === "function") {
-      const response = await admin.messaging().sendEachForMulticast({
+      response = await admin.messaging().sendEachForMulticast({
         ...message,
         tokens: validTokens,
       });
-      console.log(
-        `Firebase push sent: ${response.successCount} messages sent successfully.`
-      );
-      if (response.failureCount > 0) {
-        console.log(`${response.failureCount} messages failed to send`);
-        response.responses.forEach((resp, idx) => {
-          if (!resp.success) {
-            console.error(
-              `Failed to send to token ${validTokens[idx].slice(0, 20)}...:`,
-              resp.error?.code || resp.error
-            );
-          }
-        });
-      }
     } else if (typeof admin.messaging().sendMulticast === "function") {
-      const response = await admin.messaging().sendMulticast({
+      response = await admin.messaging().sendMulticast({
         ...message,
         tokens: validTokens,
       });
-      console.log(
-        `Firebase push sent: ${response.successCount} messages sent successfully.`
-      );
-      if (response.failureCount > 0) {
-        console.log(`${response.failureCount} messages failed to send`);
-        response.responses.forEach((resp, idx) => {
-          if (!resp.success) {
-            console.error(
-              `Failed to send to token ${validTokens[idx].slice(0, 20)}...: `,
-              resp.error?.code || resp.error
-            );
-          }
-        });
-      }
-    } else {
-      // fallback: отправка по одному токену
+    }
+
+    if (!response) {
+      // fallback: индивидуальная отправка
       console.log("Using individual send method");
       let successCount = 0;
       let failureCount = 0;
       for (const token of validTokens) {
         try {
-          await admin.messaging().send({
-            ...message,
-            token,
-          });
+          await admin.messaging().send({ ...message, token });
           successCount++;
           console.log(`Firebase push sent to token: ${token.slice(0, 20)}...`);
         } catch (err) {
@@ -164,16 +135,65 @@ async function sendFirebaseNotifications(order, tokens) {
             `Failed to send to token ${token.slice(0, 20)}...: `,
             err.code || err.message
           );
+          // Удаляем недействительный токен
+          if (
+            err.code === "messaging/registration-token-not-registered" ||
+            err.code === "messaging/invalid-registration-token"
+          ) {
+            await UserInfo.updateMany(
+              { fcmTokens: token },
+              { $pull: { fcmTokens: token } }
+            );
+            console.log(`Removed invalid token from database: ${token.slice(0, 20)}...`);
+          }
         }
       }
       console.log(
         `Individual send completed: ${successCount} success, ${failureCount} failures`
       );
+      return;
+    }
+
+    console.log(
+      `Firebase push sent: ${response.successCount} messages sent successfully.`
+    );
+
+    if (response.failureCount > 0) {
+      console.log(`${response.failureCount} messages failed to send`);
+      const invalidTokens = [];
+      response.responses.forEach((resp, idx) => {
+        if (!resp.success) {
+          const errorCode = resp.error?.code || "";
+          console.error(
+            `Failed to send to token ${validTokens[idx].slice(0, 20)}...:`,
+            errorCode
+          );
+
+          // Помечаем токен для удаления, если ошибка указывает на недействительный токен
+          if (
+            errorCode === "messaging/registration-token-not-registered" ||
+            errorCode === "messaging/invalid-registration-token" ||
+            errorCode === "messaging/invalid-argument"
+          ) {
+            invalidTokens.push(validTokens[idx]);
+          }
+        }
+      });
+
+      if (invalidTokens.length > 0) {
+        // Удаляем все недействительные токены из БД
+        await UserInfo.updateMany(
+          { fcmTokens: { $in: invalidTokens } },
+          { $pull: { fcmTokens: { $in: invalidTokens } } }
+        );
+        console.log(`Removed ${invalidTokens.length} invalid tokens from database`);
+      }
     }
   } catch (error) {
     console.error("Error sending Firebase push:", error.code || error.message);
   }
 }
+
 
 export async function POST(req) {
   const sig = req.headers.get('stripe-signature');
