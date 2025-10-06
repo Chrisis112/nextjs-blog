@@ -185,7 +185,8 @@ export async function POST(req) {
     const signSecret = process.env.STRIPE_SIGN_SECRET;
 
     // raw body в buffer для Stripe webhook
-    const reqBuffer = Buffer.from(await req.arrayBuffer());
+const rawBody = await req.arrayBuffer();
+const reqBuffer = Buffer.from(rawBody);
 
     let event;
     try {
