@@ -19,16 +19,25 @@ export default function CartProduct({ product, onRemove }) {
       </div>
       <div className="grow">
         <h3 className="font-semibold">{getLocalizedText(product.name)}</h3>
+
+        {product.location && (
+          <div className="text-sm">
+            <strong>{t('menuItem.location2')}:</strong> <span>{getLocalizedText(product.location)}</span>
+          </div>
+        )}
+
         {product.size && (
           <div className="text-sm">
             {t('cartProduct.size')} <span>{getLocalizedText(product.size.name)}</span>
           </div>
         )}
+
         {product.temperature && (
           <div className="text-sm">
             {t('cartProduct.temperature')} <span>{getLocalizedText(product.temperature.name)}</span>
           </div>
         )}
+
         {product.extras?.length > 0 && (
           <div className="text-sm text-gray-500">
             {product.extras.map(extra => (

@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import { Order } from "@/models/Order";
 import { UserInfo } from "@/models/UserInfo";
 import Pusher from "pusher";
@@ -20,19 +19,6 @@ const requiredFirebaseEnvs = [
 ];
 const missingEnvs = requiredFirebaseEnvs.filter((env) => !process.env[env]);
 if (missingEnvs.length > 0) {
-  console.error("Missing Firebase environment variables:", missingEnvs);
-} else {
-  console.log("All Firebase environment variables present");
-  console.log("FIREBASE_PROJECT_ID:", process.env.FIREBASE_PROJECT_ID);
-  console.log("FIREBASE_CLIENT_EMAIL:", process.env.FIREBASE_CLIENT_EMAIL);
-  console.log(
-    "FIREBASE_PRIVATE_KEY length:",
-    process.env.FIREBASE_PRIVATE_KEY?.length
-  );
-  console.log(
-    "FIREBASE_PRIVATE_KEY preview:",
-    process.env.FIREBASE_PRIVATE_KEY?.slice(0, 50)
-  );
 }
 
 // Инициализация Firebase Admin SDK
@@ -258,10 +244,13 @@ export async function POST(req) {
         }
 
         try {
-          const sellers = await UserInfo.find({
-            seller: true,
-            fcmTokens: { $exists: true, $ne: [] },
-          });
+          const orderLocation = updatedOrder.cartProducts?.[0]?.location;
+const sellers = await UserInfo.find({
+  seller: true,
+  fcmTokens: { $exists: true, $ne: [] },
+  location: orderLocation,
+});
+
 
           const allFcmTokens = sellers.flatMap((seller) => seller.fcmTokens || []);
           console.log(

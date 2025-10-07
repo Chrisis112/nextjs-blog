@@ -72,11 +72,17 @@
     "extraIngredients": "Extra ingredients",
     "addExtras": "Add ingredients prices",
     "save": "Save",
-        "pickSize": "Pick your size",
+    "pickSize": "Pick your size",
+    "locations": "Sale place",
+    "location2": "Order place",
+    "enterLocation": "Enter sale place",
+    "addLocation": "Add sale place",
     "selectTemperature": "Select temperature",
     "anyExtras": "Any extras?",
     "addToCartPrice": "Add to cart €{{price}}",
+            "pickLocation": "Choose place",
     "cancel": "Cancel",
+    "accept": "Choose",
         "editLanguage": "Editing Language",
     "otherTranslations": "Other translations ",
     "notTranslated": " Not translated "
@@ -95,6 +101,8 @@
     "bonusPoints": "Your bonus points",
     "admin": "Admin",
     "seller": "Seller",
+    "pickLocation": "Choose working location",
+    "selectLocationPlaceholder": "-- Choose location --",
     "save": "Save"
   },
     "userTabs": {

@@ -13,7 +13,8 @@ export default function MenuItemTile({ onAddToCart, ...item }) {
     sizes = [],
     extraIngredientPrices = [],
     temperature = [],
-    pricePoints
+    pricePoints,
+    locations // поле с локациями (может быть массив или строка)
   } = item;
 
   const hasSizesOrExtras =
@@ -29,6 +30,16 @@ export default function MenuItemTile({ onAddToCart, ...item }) {
       : (field[currentLang] || field['ru'] || '');
   };
 
+  // Формируем строку по локациям, если есть
+  let locationsText = "";
+  if (locations && (Array.isArray(locations) ? locations.length : locations)) {
+    if (Array.isArray(locations)) {
+      locationsText = locations.join(", ");
+    } else {
+      locationsText = locations;
+    }
+  }
+
   return (
     <div
       className="bg-gray-200 p-4 rounded-lg text-center
@@ -37,8 +48,8 @@ export default function MenuItemTile({ onAddToCart, ...item }) {
       <div
         className="mx-auto mb-3"
         style={{
-          width: "180px",     // ширина карточки
-          height: "180px",    // высота карточки
+          width: "180px",  // ширина карточки
+          height: "180px", // высота карточки
           position: "relative",
           borderRadius: "8px",
           overflow: "hidden"
@@ -53,9 +64,14 @@ export default function MenuItemTile({ onAddToCart, ...item }) {
         />
       </div>
 
-      <h4 className="font-semibold text-xl mb-2">
+      <h4 className="font-semibold text-xl mb-1">
         {getLocalizedText(name)}
       </h4>
+
+      {/* Вывод локаций, если есть */}
+      {locationsText && (
+        <div className="text-sm text-gray-600 mb-1">{locationsText}</div>
+      )}
 
       <p className="text-gray-500 text-sm line-clamp-3 mb-3">
         {getLocalizedText(description)}

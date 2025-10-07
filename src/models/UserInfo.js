@@ -10,7 +10,9 @@ const UserInfoSchema = new Schema({
   admin: { type: Boolean, default: false },
   seller: { type: Boolean, default: false },
   points: { type: Number, default: 0 },
-  fcmTokens: { type: [String], default: [] }, // добавьте это поле!
+  fcmTokens: { type: [String], default: [] },
+  location: { type: String, default: '' }
+
 }, { timestamps: true });
 
 export const UserInfo = models?.UserInfo || model('UserInfo', UserInfoSchema);

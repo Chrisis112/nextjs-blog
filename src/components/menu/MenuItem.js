@@ -3,23 +3,26 @@ import { CartContext } from "@/components/AppContext";
 import MenuItemTile from "@/components/menu/MenuItemTile";
 import Image from "next/legacy/image";
 import { useContext, useState } from "react";
-import { useProfile } from "@/components/UseProfile";
 import { useTranslation } from "react-i18next";
 
 export default function MenuItem(menuItem) {
   const {
     image, name, description, basePrice,
-    sizes = [], extraIngredientPrices = [], temperature = [], pricePoints = 0
+    sizes = [], extraIngredientPrices = [], temperature = [], pricePoints = 0, locations = []
   } = menuItem;
   const [selectedSize, setSelectedSize] = useState(sizes?.[0] || null);
   const [selectedTemperature, setSelectedTemperature] = useState(temperature?.[0] || null);
   const [selectedExtras, setSelectedExtras] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const { addToCart } = useContext(CartContext);
-  const { data: profileData } = useProfile();
   const { t, i18n } = useTranslation();
 
   const currentLang = i18n.language || 'ru';
+
+  // Новое: выбранная локация для заказа
+  const [selectedLocation, setSelectedLocation] = useState(
+    locations && locations.length > 0 ? locations[0] : ''
+  );
 
   // Универсальная функция для вывода текста с учётом типа
   const getLocalizedText = (field) => {
@@ -30,12 +33,15 @@ export default function MenuItem(menuItem) {
   };
 
   async function handleAddToCartButtonClick() {
-    const hasOptions = sizes.length > 0 || temperature.length > 0 || extraIngredientPrices.length > 0;
+    const hasOptions = sizes.length > 0 || temperature.length > 0 || extraIngredientPrices.length > 0 || (locations && locations.length > 0);
     if (hasOptions && !showPopup) {
       setShowPopup(true);
       return;
     }
-    addToCart(menuItem, selectedSize, selectedExtras, selectedTemperature);
+    addToCart(
+      { ...menuItem, location: selectedLocation }, // передаем и выбранную локацию!
+      selectedSize, selectedExtras, selectedTemperature
+    );
     await new Promise(resolve => setTimeout(resolve, 1000));
     setShowPopup(false);
   }
@@ -49,7 +55,6 @@ export default function MenuItem(menuItem) {
     }
   }
 
-  // Цены
   let selectedPrice = basePrice;
   let selectedPoints = pricePoints;
   if (selectedSize) {
@@ -66,23 +71,31 @@ export default function MenuItem(menuItem) {
       selectedPoints += extra.price;
     }
   }
+
   return (
     <>
       {showPopup && (
         <div
           onClick={() => setShowPopup(false)}
-          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
         >
           <div
-            style={{ width: 220, minHeight: 400 }}
+            style={{
+              width: "94vw",
+              maxWidth: 320,
+              minHeight: 100,
+              maxHeight: "65vh",
+              overflowY: "auto",
+              borderRadius: "18px",
+              boxShadow: "0 4px 32px 4px rgba(28,28,28,0.18)",
+            }}
             onClick={ev => ev.stopPropagation()}
-            className="bg-white p-4 rounded-lg max-w-md shadow-lg"
+            className="bg-white p-4 max-w-xs w-full"
           >
             <div className="items-center flex flex-col">
-              {/* Единый контейнер для изображения */}
               <div style={{
-                width: 220,
-                height: 300,
+                width: "160px",
+                height: "160px",
                 position: "relative",
                 borderRadius: "8px",
                 overflow: "hidden",
@@ -97,6 +110,24 @@ export default function MenuItem(menuItem) {
               </div>
               <h2 className="text-lg font-bold text-center mb-2">{getLocalizedText(name)}</h2>
               <p className="text-center text-gray-500 text-sm mb-2">{getLocalizedText(description)}</p>
+
+              {/* Новое: выбор локации */}
+              {locations?.length > 0 && (
+                <div className="mb-3 w-full">
+                  <label className="block text-gray-700 font-medium text-sm mb-1">
+                    {t('menuItem.pickLocation') || "Локация"}
+                  </label>
+                  <select
+                    value={selectedLocation}
+                    onChange={e => setSelectedLocation(e.target.value)}
+                    className="w-full border rounded px-2 py-1"
+                  >
+                    {locations.map(loc => (
+                      <option value={loc} key={loc}>{loc}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               {sizes?.length > 0 && (
                 <div className="py-2 w-full">
@@ -158,7 +189,7 @@ export default function MenuItem(menuItem) {
                 </div>
               )}
               <button
-                className="primary w-full sticky bottom-2 mt-3 bg-indigo-600 text-white rounded py-2 hover:bg-indigo-700"
+                className="primary w-full mt-3 bg-indigo-600 text-white rounded py-2 hover:bg-indigo-700"
                 onClick={handleAddToCartButtonClick}
               >
                 {t('menuItem.addToCartPrice', { price: selectedPrice })}
@@ -173,7 +204,6 @@ export default function MenuItem(menuItem) {
           </div>
         </div>
       )}
-      {/* Тайл компонента — тоже под контролем! */}
       <MenuItemTile
         onAddToCart={handleAddToCartButtonClick}
         {...menuItem}

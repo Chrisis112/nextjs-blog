@@ -183,7 +183,7 @@ return (
           <Link href={'/#about'}>{t('nav.about')}</Link>
           <Link href={'/#contact'}>{t('nav.contact')}</Link>
         </nav>
-        <div className="flex items-center gap-4 h-16">
+        <div className="flex items-center gap-4 h-16 pr-3">
           <LanguageSwitcher />
           <AuthLinks status={status} userName={userName} />
           <Link href={'/cart'} className="relative">

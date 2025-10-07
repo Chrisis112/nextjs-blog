@@ -1,21 +1,19 @@
 import { useEffect, useState } from "react";
 import EditableImage from "@/components/layout/EditableImage";
 import MenuItemPriceProps from "@/components/layout/MenuItemPriceProps";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 export default function MenuItemForm({ onSubmit, menuItem }) {
-  const { t, i18n } = useTranslation();
-  
-  // Состояние для выбранного языка редактирования
+  const { t } = useTranslation();
+
   const [editingLanguage, setEditingLanguage] = useState('ru');
-  
-  // Состояния для переводов названий и описаний
+
   const [nameTranslations, setNameTranslations] = useState({
     ru: menuItem?.name?.ru || '',
     en: menuItem?.name?.en || '',
     et: menuItem?.name?.et || ''
   });
-  
+
   const [descriptionTranslations, setDescriptionTranslations] = useState({
     ru: menuItem?.description?.ru || '',
     en: menuItem?.description?.en || '',
@@ -31,6 +29,9 @@ export default function MenuItemForm({ onSubmit, menuItem }) {
   const [pricePoints, setpricePoints] = useState(menuItem?.pricePoints || '');
   const [extraIngredientPrices, setExtraIngredientPrices] = useState(menuItem?.extraIngredientPrices || []);
 
+  // locations - массив строк, по умолчанию из menuItem или пустой
+  const [locations, setLocations] = useState(menuItem?.locations || []);
+
   useEffect(() => {
     fetch('/api/categories').then(res => {
       res.json().then(categories => {
@@ -39,7 +40,6 @@ export default function MenuItemForm({ onSubmit, menuItem }) {
     });
   }, []);
 
-  // Функция для обновления перевода названия
   const updateNameTranslation = (value) => {
     setNameTranslations(prev => ({
       ...prev,
@@ -47,7 +47,6 @@ export default function MenuItemForm({ onSubmit, menuItem }) {
     }));
   };
 
-  // Функция для обновления перевода описания
   const updateDescriptionTranslation = (value) => {
     setDescriptionTranslations(prev => ({
       ...prev,
@@ -55,7 +54,25 @@ export default function MenuItemForm({ onSubmit, menuItem }) {
     }));
   };
 
-  // Языковые кнопки
+  // Добавить новое пустое поле для локации
+  const addLocationField = () => {
+    setLocations(prev => [...prev, '']);
+  };
+
+  // Изменить значение конкретного поля локации
+  const updateLocationField = (index, value) => {
+    setLocations(prev => {
+      const newLocations = [...prev];
+      newLocations[index] = value;
+      return newLocations;
+    });
+  };
+
+  // Удалить поле локации по индексу
+  const removeLocationField = (index) => {
+    setLocations(prev => prev.filter((_, i) => i !== index));
+  };
+
   const languages = [
     { code: 'ru', name: 'РУ', flag: '🇷🇺' },
     { code: 'en', name: 'EN', flag: '🇬🇧' },
@@ -66,15 +83,16 @@ export default function MenuItemForm({ onSubmit, menuItem }) {
     <form
       onSubmit={ev =>
         onSubmit(ev, {
-          image, 
+          image,
           name: nameTranslations,
           description: descriptionTranslations,
-          basePrice, 
-          sizes, 
-          extraIngredientPrices, 
-          category, 
-          temperature, 
-          pricePoints
+          basePrice,
+          sizes,
+          extraIngredientPrices,
+          category,
+          temperature,
+          pricePoints,
+          locations
         })
       }
       className="mt-8 max-w-2xl mx-auto"
@@ -97,8 +115,8 @@ export default function MenuItemForm({ onSubmit, menuItem }) {
                   type="button"
                   onClick={() => setEditingLanguage(lang.code)}
                   className={`px-3 py-2 rounded border flex items-center gap-2 ${
-                    editingLanguage === lang.code 
-                      ? 'bg-primary text-white border-primary' 
+                    editingLanguage === lang.code
+                      ? 'bg-primary text-white border-primary'
                       : 'bg-gray-100 border-gray-300 hover:bg-gray-200'
                   }`}
                 >
@@ -160,22 +178,56 @@ export default function MenuItemForm({ onSubmit, menuItem }) {
             onChange={ev => setpricePoints(ev.target.value)}
           />
 
-          <MenuItemPriceProps name={t('menuItem.sizes')}
-                             addLabel={t('menuItem.addSize')}
-                             props={sizes}
-                             setProps={setSizes} />
+          <MenuItemPriceProps
+            name={t('menuItem.sizes')}
+            addLabel={t('menuItem.addSize')}
+            props={sizes}
+            setProps={setSizes}
+          />
 
-          <MenuItemPriceProps name={t('menuItem.temperature')}
-                             addLabel={t('menuItem.addTemperature')}
-                             props={temperature}
-                             setProps={setTemperature} />
+          <MenuItemPriceProps
+            name={t('menuItem.temperature')}
+            addLabel={t('menuItem.addTemperature')}
+            props={temperature}
+            setProps={setTemperature}
+          />
 
-          <MenuItemPriceProps name={t('menuItem.extraIngredients')}
-                             addLabel={t('menuItem.addExtras')}
-                             props={extraIngredientPrices}
-                             setProps={setExtraIngredientPrices} />
+          <MenuItemPriceProps
+            name={t('menuItem.extraIngredients')}
+            addLabel={t('menuItem.addExtras')}
+            props={extraIngredientPrices}
+            setProps={setExtraIngredientPrices}
+          />
 
-          <button type="submit" className="bg-primary text-white px-6 py-2 rounded">
+          {/* Администрирование locations вручную */}
+          <label className="mt-4 block font-semibold">{t('menuItem.locations')}</label>
+          {locations.map((loc, index) => (
+            <div key={index} className="flex gap-2 mb-2 items-center">
+              <input
+                type="text"
+                className="flex-grow border border-gray-300 rounded px-3 py-1"
+                value={loc}
+                onChange={(e) => updateLocationField(index, e.target.value)}
+                placeholder={t('menuItem.enterLocation')}
+              />
+              <button
+                type="button"
+                onClick={() => removeLocationField(index)}
+                className="text-red-600 px-2 py-1 rounded border border-red-600 hover:bg-red-600 hover:text-white"
+              >
+                &times;
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={addLocationField}
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          >
+            + {t('menuItem.addLocation')}
+          </button>
+
+          <button type="submit" className="bg-primary text-white px-6 py-2 rounded mt-6 block">
             {t('menuItem.save')}
           </button>
         </div>

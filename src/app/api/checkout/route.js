@@ -18,7 +18,7 @@ function getLocalizedText(field, currentLang = 'ru') {
 export async function POST(req) {
   await mongoose.connect(process.env.MONGO_URL);
 
-  const { cartProducts, address } = await req.json();
+const { cartProducts, address, location } = await req.json();
   const session = await getServerSession(authOptions);
   const userEmail = session?.user?.email;
 
@@ -27,6 +27,7 @@ export async function POST(req) {
   const orderDoc = await Order.create({
     userEmail,
     ...address,
+    location,
     cartProducts,
     paid: false,
     orderNumber,
@@ -37,37 +38,39 @@ export async function POST(req) {
   const stripeLineItems = [];
   const currentLang = 'ru';
 
-  for (const cartProduct of cartProducts) {
-    const productInfo = await MenuItem.findById(cartProduct._id);
-    const productInfoPoints = await MenuItem.findById(cartProduct.points);
+for (const cartProduct of cartProducts) {
+  const productInfo = await MenuItem.findById(cartProduct._id);
+  
+  let productPrice = productInfo.basePrice;
 
-    let productPrice = productInfo.basePrice;
-
-    if (cartProduct.size) {
-      const size = productInfo.sizes.find(size => size._id.toString() === cartProduct.size._id.toString());
-      if (size) productPrice += size.price;
-    }
-    if (cartProduct.extras?.length > 0) {
-      for (const cartProductExtraThing of cartProduct.extras) {
-        const productExtras = productInfo.extraIngredientPrices;
-        const extraThingInfo = productExtras.find(extra => extra._id.toString() === cartProductExtraThing._id.toString());
-        if (extraThingInfo) productPrice += extraThingInfo.price;
-      }
-    }
-
-    const productName = getLocalizedText(cartProduct.name, currentLang);
-
-    stripeLineItems.push({
-      quantity: 1,
-      price_data: {
-        currency: 'EUR',
-        product_data: {
-          name: productName,
-        },
-        unit_amount: Math.round(productPrice * 100),
-      },
-    });
+  if (cartProduct.size) {
+    const size = productInfo.sizes.find(size => size._id.toString() === cartProduct.size._id.toString());
+    if (size) productPrice += size.price;
   }
+  
+  if (cartProduct.extras?.length > 0) {
+    for (const cartProductExtraThing of cartProduct.extras) {
+      const extraThingInfo = productInfo.extraIngredientPrices.find(extra => extra._id.toString() === cartProductExtraThing._id.toString());
+      if (extraThingInfo) productPrice += extraThingInfo.price;
+    }
+  }
+
+  let productName = getLocalizedText(cartProduct.name, currentLang);
+
+  // Проверяем и применяем fallback
+  if (!productName || productName.trim().length === 0) {
+    productName = getLocalizedText(productInfo.name, currentLang) || 'Product';
+  }
+
+  stripeLineItems.push({
+    quantity: 1,
+    price_data: {
+      currency: 'EUR',
+      product_data: { name: productName },
+      unit_amount: Math.round(productPrice * 100),
+    },
+  });
+}
 
   const stripeSession = await stripe.checkout.sessions.create({
     line_items: stripeLineItems,

@@ -5,11 +5,7 @@ const ExtraPriceSchema = new Schema({
   price: Number,
 });
 
-const TranslationSchema = new Schema({
-  ru: String,
-  en: String,
-  et: String,
-}, { _id: false });
+
 
 const MenuItemSchema = new Schema({
   image: { type: String },
@@ -17,6 +13,7 @@ const MenuItemSchema = new Schema({
   description: { type: Schema.Types.Mixed },
   category: { type: mongoose.Types.ObjectId },
   basePrice: { type: Number },
+  locations: { type: [String], default: [] },
   sizes: { type: [ExtraPriceSchema] },
   temperature: { type: [ExtraPriceSchema] },
   extraIngredientPrices: { type: [ExtraPriceSchema] },

@@ -71,11 +71,17 @@
     "extraIngredients": "Дополнительные ингредиенты",
     "addExtras": "Добавить цену ингредиентов",
     "save": "Сохранить",
-        "pickSize": "Выберите размер",
+    "locations": "Место продажи",
+    "location2": "Место заказа",
+    "enterLocation": "Введите место продажи",
+    "pickLocation": "Выберите локацию",
+    "addLocation": "Добавить место продажи",
+    "pickSize": "Выберите размер",
     "selectTemperature": "Выберите температуру",
     "anyExtras": "Дополнительно",
     "addToCartPrice": "Добавить в корзину €{{price}}",
     "cancel": "Отмена",
+    "accept": "Подтвердить",
     "editLanguage": "Язык редактирования ",
     "otherTranslations": "Другие переводы ",
     "notTranslated": "Не переведено "
@@ -95,6 +101,8 @@
     "bonusPoints": "Ваши бонусные очки",
     "admin": "Администратор",
     "seller": "Продавец",
+    "pickLocation": "Выберите место работы",
+    "selectLocationPlaceholder": "-- Выберите место --",
     "save": "Сохранить"
   },
     "userTabs": {

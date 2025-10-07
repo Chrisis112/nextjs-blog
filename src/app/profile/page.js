@@ -1,9 +1,9 @@
 'use client';
 import UserForm from "@/components/layout/UserForm";
 import UserTabs from "@/components/layout/UserTabs";
-import {useSession} from "next-auth/react";
-import {redirect} from "next/navigation";
-import {useEffect, useState} from "react";
+import { useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 export default function ProfilePage() {
@@ -13,8 +13,11 @@ export default function ProfilePage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isSeller, setIsSeller] = useState(false);
   const [profileFetched, setProfileFetched] = useState(false);
-  const {status} = session;
+  const { status } = session;
   const [points, setPoints] = useState(0);
+
+  // Добавляем состояние locations
+  const [locations, setLocations] = useState([]);
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -25,11 +28,21 @@ export default function ProfilePage() {
           setIsSeller(data.seller);
           setProfileFetched(true);
           setPoints(data.points);
-        })
+        });
+      });
+
+      // Загрузка уникальных локаций из меню
+      fetch('/api/menu-items').then(res => res.json()).then(items => {
+        const locSet = new Set();
+        items.forEach(item => {
+          if (item.locations && item.locations.length) {
+            item.locations.forEach(loc => locSet.add(loc));
+          }
+        });
+        setLocations(Array.from(locSet));
       });
     }
-  }, [session, status]);
-  
+  }, [status]);
 
   async function handleProfileInfoUpdate(ev, data) {
     ev.preventDefault();
@@ -37,11 +50,11 @@ export default function ProfilePage() {
     const savingPromise = new Promise(async (resolve, reject) => {
       const response = await fetch('/api/profile', {
         method: 'PUT',
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
       if (response.ok)
-        resolve()
+        resolve();
       else
         reject();
     });
@@ -51,7 +64,6 @@ export default function ProfilePage() {
       success: 'Profile saved!',
       error: 'Error',
     });
-
   }
 
   if (status === 'loading' || !profileFetched) {
@@ -64,12 +76,10 @@ export default function ProfilePage() {
 
   return (
     <section className="mt-8">
-      <UserTabs isAdmin={isAdmin} isSeller = {isSeller} />
+      <UserTabs isAdmin={isAdmin} isSeller={isSeller} />
       <div className="max-w-2xl mx-auto mt-8">
-        <UserForm user={user} points={points} onSave={handleProfileInfoUpdate} />
+        <UserForm user={user} points={points} onSave={handleProfileInfoUpdate} locations={locations} />
       </div>
-      
     </section>
-   
   );
 }

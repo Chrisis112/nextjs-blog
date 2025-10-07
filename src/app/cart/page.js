@@ -99,57 +99,65 @@ window.location.href = data.url;
           {cartProducts?.length === 0 && (
             <div>{t('cartPage.noProducts')}</div>
           )}
-          {cartProducts?.length > 0 && cartProducts.map((product, index) => (
-            <div key={product.image + index} className="flex items-center gap-4 border-b py-4">
-              <div className="w-24">
-                <Image width={240} height={240} src={product.image} alt={product.name} />
-              </div>
-              <div className="grow">
-<h3 className="font-semibold">{getLocalizedText(product.name)}</h3>
+       {cartProducts?.length > 0 && cartProducts.map((product, index) => (
+  <div key={product.image + index} className="flex items-center gap-4 border-b py-4">
+    <div className="w-24">
+      <Image width={240} height={240} src={product.image} alt={product.name} />
+    </div>
+    <div className="grow">
+      <h3 className="font-semibold">{getLocalizedText(product.name)}</h3>
 
-{product.size && (
-  <div className="text-sm">
-    {t('cartPage.size')}: <span>{getLocalizedText(product.size.name)}</span>
-  </div>
-)}
+      {/* Локация заказа */}
+      {product.location && (
+        <div className="text-sm">
+          {t('menuItem.location2')}: <span>{getLocalizedText(product.location)}</span>
+        </div>
+      )}
 
-{product.temperature && (
-  <div className="text-sm">
-    {t('cartPage.temperature')}: <span>{getLocalizedText(product.temperature.name)}</span>
-  </div>
-)}
+      {product.size && (
+        <div className="text-sm">
+          {t('cartPage.size')}: <span>{getLocalizedText(product.size.name)}</span>
+        </div>
+      )}
 
-{product.extras?.length > 0 && (
-  <div className="text-sm text-gray-500">
-    {product.extras.map(extra => (
-      <div key={getLocalizedText(extra.name)}>
-        {getLocalizedText(extra.name)} €{extra.price}
-      </div>
-    ))}
-  </div>
-)}
+      {product.temperature && (
+        <div className="text-sm">
+          {t('cartPage.temperature')}: <span>{getLocalizedText(product.temperature.name)}</span>
+        </div>
+      )}
 
-              </div>
-              <div className="text-lg font-semibold">
-                €{cartProductPrice(product)}
-                {profileData?.city && (
-                  <div>
-                    {t('cartPage.forPoints')}: {cartProductPrice2(product)}
-                  </div>
-                )}
-              </div>
-              <div className="ml-2">
-                <button
-                  type="button"
-                  onClick={() => removeCartProduct(index)}
-                  className="p-2"
-                  aria-label={t('cartPage.removeProduct')}
-                >
-                  <Trash />
-                </button>
-              </div>
+      {product.extras?.length > 0 && (
+        <div className="text-sm text-gray-500">
+          {product.extras.map(extra => (
+            <div key={getLocalizedText(extra.name)}>
+              {getLocalizedText(extra.name)} €{extra.price}
             </div>
           ))}
+        </div>
+      )}
+
+    </div>
+    <div className="text-lg font-semibold">
+      €{cartProductPrice(product)}
+      {profileData?.city && (
+        <div>
+          {t('cartPage.forPoints')}: {cartProductPrice2(product)}
+        </div>
+      )}
+    </div>
+    <div className="ml-2">
+      <button
+        type="button"
+        onClick={() => removeCartProduct(index)}
+        className="p-2"
+        aria-label={t('cartPage.removeProduct')}
+      >
+        <Trash />
+      </button>
+    </div>
+  </div>
+))}
+
           <div className="flex justify-end items-center mt-4 gap-2">
             <div className="text-gray-500">{t('cartPage.total')}:</div>
             <div className="font-semibold text-right">€{subtotal}<br /></div>
