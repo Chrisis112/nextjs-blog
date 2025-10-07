@@ -73,9 +73,16 @@ export default function PusherOrderNotifications({ seller }) {
 
     channel.bind('pusher:subscription_error', (error) => {});
 
-    channel.bind("order-paid", (data) => {
-      showPersistentSoundToast(data.order);
-    });
+channel.bind("order-paid", (data) => {
+  const orderLocation = data.order.cartProducts?.[0]?.location;
+  if (
+    (Array.isArray(seller.locations) && seller.locations.includes(orderLocation)) ||
+    (typeof seller.location === 'string' && seller.location === orderLocation)
+  ) {
+    showPersistentSoundToast(data.order);
+  }
+});
+
 
     // Firebase Messaging subscription for push notifications in foreground
     const messaging = getMessaging(firebaseApp);

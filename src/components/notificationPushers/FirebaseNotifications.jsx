@@ -42,17 +42,30 @@ export default function FirebaseNotifications({ userSeller }) {
   useEffect(() => {
     if (!messaging || !userSeller) return;
 
-    const unsubscribe = onMessage(messaging, (payload) => {
-      console.log('Foreground message received:', payload);
-      
-      if (Notification.permission === 'granted') {
-        new Notification(payload.notification?.title || 'Уведомление', {
-          body: payload.notification?.body || '',
-          icon: '/firebase-logo.png',
-          data: payload.data
-        });
-      }
-    });
+const unsubscribe = onMessage(messaging, (payload) => {
+  console.log('Foreground message received:', payload);
+
+  // определяем location заказа из payload
+  const orderLocation = data.order.cartProducts?.[0]?.location;
+
+  // проверяем продавца (userSeller)
+  if (
+    userSeller &&
+    (
+      (Array.isArray(userSeller.locations) && userSeller.locations.includes(orderLocation)) ||
+      userSeller.location === orderLocation
+    )
+  ) {
+    if (Notification.permission === 'granted') {
+      new Notification(payload.notification?.title || 'Уведомление', {
+        body: payload.notification?.body || '',
+        icon: '/firebase-logo.png',
+        data: payload.data
+      });
+    }
+  }
+});
+
 
     return () => unsubscribe();
   }, [messaging, userSeller]);
