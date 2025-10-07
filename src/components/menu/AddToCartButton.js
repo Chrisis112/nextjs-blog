@@ -3,19 +3,18 @@ import { useTranslation } from 'react-i18next';
 export default function AddToCartButton({ hasSizesOrExtras, onClick, basePrice, image }) {
   const { t } = useTranslation();
 
+  // Единый стиль кнопки для всех случаев
+  const buttonStyle = "w-full bg-primary hover:bg-green-600 text-white font-medium py-3 px-6 rounded-full transition-colors duration-200";
+
   if (!hasSizesOrExtras) {
     return (
-      <div className="mt-3">
-        <button
-          targetTop={'5%'}
-          targetLeft={'95%'}
-          src={image}
-        >
-          <div onClick={onClick}>
-            {t('addToCart.withoutOptions', { price: basePrice })}
-          </div>
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={onClick}
+        className={buttonStyle}
+      >
+        {t('addToCart.withoutOptions', { price: basePrice }) || `Add to cart €${basePrice}`}
+      </button>
     );
   }
 
@@ -23,9 +22,9 @@ export default function AddToCartButton({ hasSizesOrExtras, onClick, basePrice, 
     <button
       type="button"
       onClick={onClick}
-      className="mt-4 bg-primary text-white rounded-full px-12 py-1"
+      className={buttonStyle}
     >
-      <span>{t('addToCart.fromPrice', { price: basePrice })}</span>
+      {t('addToCart.fromPrice', { price: basePrice }) || `Add to cart (from €${basePrice})`}
     </button>
   );
 }

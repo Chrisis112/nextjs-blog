@@ -1,4 +1,3 @@
-'use client';
 import { CartContext } from "@/components/AppContext";
 import MenuItemTile from "@/components/menu/MenuItemTile";
 import Image from "next/legacy/image";
@@ -8,29 +7,33 @@ import { useTranslation } from "react-i18next";
 export default function MenuItem(menuItem) {
   const {
     image, name, description, basePrice,
-    sizes = [], extraIngredientPrices = [], temperature = [], pricePoints = 0, locations = []
+    sizes = [], extraIngredientPrices = [], temperature = [], pricePoints = 0,
+    locations = [],
   } = menuItem;
-  const [selectedSize, setSelectedSize] = useState(sizes?.[0] || null);
-  const [selectedTemperature, setSelectedTemperature] = useState(temperature?.[0] || null);
-  const [selectedExtras, setSelectedExtras] = useState([]);
-  const [showPopup, setShowPopup] = useState(false);
+
   const { addToCart } = useContext(CartContext);
   const { t, i18n } = useTranslation();
 
   const currentLang = i18n.language || 'ru';
 
-  // Новое: выбранная локация для заказа
+  // Инициализация selectedLocation: если есть выбранная из пропсов - используем её,
+  // иначе первая из массива locations
   const [selectedLocation, setSelectedLocation] = useState(
-    locations && locations.length > 0 ? locations[0] : ''
+    menuItem.selectedLocation || (locations.length > 0 ? locations[0] : '')
   );
 
-  // Универсальная функция для вывода текста с учётом типа
+  const [selectedSize, setSelectedSize] = useState(sizes?.[0] || null);
+  const [selectedTemperature, setSelectedTemperature] = useState(temperature?.[0] || null);
+  const [selectedExtras, setSelectedExtras] = useState([]);
+  const [showPopup, setShowPopup] = useState(false);
+
+  // Универсальная функция для локализации текста
   const getLocalizedText = (field) => {
     if (!field) return '';
-    return typeof field === 'string'
-      ? field
-      : (field[currentLang] || field['ru'] || '');
+    return typeof field === 'string' ? field : (field[currentLang] || field['ru'] || '');
   };
+
+  const menuItemTitle = getLocalizedText(name);
 
   async function handleAddToCartButtonClick() {
     const hasOptions = sizes.length > 0 || temperature.length > 0 || extraIngredientPrices.length > 0 || (locations && locations.length > 0);
@@ -39,7 +42,7 @@ export default function MenuItem(menuItem) {
       return;
     }
     addToCart(
-      { ...menuItem, location: selectedLocation }, // передаем и выбранную локацию!
+      { ...menuItem, selectedLocation }, // передаем выбранную локацию
       selectedSize, selectedExtras, selectedTemperature
     );
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -57,6 +60,7 @@ export default function MenuItem(menuItem) {
 
   let selectedPrice = basePrice;
   let selectedPoints = pricePoints;
+
   if (selectedSize) {
     selectedPrice += selectedSize.price;
     selectedPoints += selectedSize.price;
@@ -111,7 +115,7 @@ export default function MenuItem(menuItem) {
               <h2 className="text-lg font-bold text-center mb-2">{getLocalizedText(name)}</h2>
               <p className="text-center text-gray-500 text-sm mb-2">{getLocalizedText(description)}</p>
 
-              {/* Новое: выбор локации */}
+              {/* Выбор локации */}
               {locations?.length > 0 && (
                 <div className="mb-3 w-full">
                   <label className="block text-gray-700 font-medium text-sm mb-1">
@@ -129,6 +133,7 @@ export default function MenuItem(menuItem) {
                 </div>
               )}
 
+              {/* Остальной интерфейс опций (размер, температура, допы) */}
               {sizes?.length > 0 && (
                 <div className="py-2 w-full">
                   <h3 className="text-center text-gray-700 mb-1">{t('menuItem.pickSize')}</h3>
@@ -188,6 +193,7 @@ export default function MenuItem(menuItem) {
                   ))}
                 </div>
               )}
+
               <button
                 className="primary w-full mt-3 bg-indigo-600 text-white rounded py-2 hover:bg-indigo-700"
                 onClick={handleAddToCartButtonClick}
@@ -204,10 +210,12 @@ export default function MenuItem(menuItem) {
           </div>
         </div>
       )}
+
       <MenuItemTile
         onAddToCart={handleAddToCartButtonClick}
         {...menuItem}
         image={image}
+        title={menuItemTitle}
       />
     </>
   );

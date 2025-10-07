@@ -1,10 +1,13 @@
 'use client';
+
 import UserForm from "@/components/layout/UserForm";
 import UserTabs from "@/components/layout/UserTabs";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+
+import { ALL_LOCATIONS } from '@/libs/locations';
 
 export default function ProfilePage() {
   const session = useSession();
@@ -16,8 +19,8 @@ export default function ProfilePage() {
   const { status } = session;
   const [points, setPoints] = useState(0);
 
-  // Добавляем состояние locations
-  const [locations, setLocations] = useState([]);
+  // Используем фиксированный список локаций из общего файла
+  const locations = ALL_LOCATIONS;
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -29,17 +32,6 @@ export default function ProfilePage() {
           setProfileFetched(true);
           setPoints(data.points);
         });
-      });
-
-      // Загрузка уникальных локаций из меню
-      fetch('/api/menu-items').then(res => res.json()).then(items => {
-        const locSet = new Set();
-        items.forEach(item => {
-          if (item.locations && item.locations.length) {
-            item.locations.forEach(loc => locSet.add(loc));
-          }
-        });
-        setLocations(Array.from(locSet));
       });
     }
   }, [status]);
@@ -53,10 +45,8 @@ export default function ProfilePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
-      if (response.ok)
-        resolve();
-      else
-        reject();
+      if (response.ok) resolve();
+      else reject();
     });
 
     await toast.promise(savingPromise, {

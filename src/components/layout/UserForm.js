@@ -1,40 +1,34 @@
 'use client';
-import AddressInputs from "@/components/layout/AddressInputs";
+
 import EditableImage from "@/components/layout/EditableImage";
 import { useProfile } from "@/components/UseProfile";
 import { useState, useEffect } from "react";
 import { useTranslation } from 'react-i18next';
 
-export default function UserForm({ user, onSave, locations }) {  // locations в пропсах обязательны
+export default function UserForm({ user, onSave, locations }) {  // locations - обязательны
+
   const { t } = useTranslation();
 
   const [userName, setUserName] = useState(user?.name || '');
   const [image, setImage] = useState(user?.image || '');
   const [phone, setPhone] = useState(user?.phone || '');
-  const [streetAddress, setStreetAddress] = useState(user?.streetAddress || '');
-  const [postalCode, setPostalCode] = useState(user?.postalCode || '');
-  const [city, setCity] = useState(user?.city || '');
-  const [country, setCountry] = useState(user?.country || '');
   const [admin, setAdmin] = useState(user?.admin || false);
   const [seller, setSeller] = useState(user?.seller || false);
   const [selectedLocation, setSelectedLocation] = useState(user?.location || '');
 
   const { data: loggedInUserData } = useProfile();
 
+  // На случай обновления пользователя извне
   useEffect(() => {
     setSelectedLocation(user?.location || '');
   }, [user]);
 
-  function handleAddressChange(propName, value) {
-    if (propName === 'phone') setPhone(value);
-    else if (propName === 'streetAddress') setStreetAddress(value);
-    else if (propName === 'postalCode') setPostalCode(value);
-    else if (propName === 'city') setCity(value);
-    else if (propName === 'country') setCountry(value);
-  }
-
   // Защита для locations: если не передали, не использовать
   const safeLocations = Array.isArray(locations) ? locations : [];
+
+  const handlePhoneChange = (ev) => {
+    setPhone(ev.target.value);
+  };
 
   return (
     <div className="md:flex gap-4">
@@ -52,14 +46,12 @@ export default function UserForm({ user, onSave, locations }) {  // locations в
             phone,
             admin,
             seller,
-            streetAddress,
-            city,
-            country,
-            postalCode,
             location: selectedLocation,
+            // Удалены поля адреса из передачи
           })
         }
       >
+
         {seller && safeLocations.length > 0 && (
           <div className="mb-4">
             <label htmlFor="location-select" className="block mb-2 font-semibold text-gray-700">
@@ -86,9 +78,11 @@ export default function UserForm({ user, onSave, locations }) {  // locations в
           value={userName} onChange={ev => setUserName(ev.target.value)}
         />
 
-        <AddressInputs
-          addressProps={{ phone, streetAddress, postalCode, city, country }}
-          setAddressProp={handleAddressChange}
+        <label>{t('form.phone')}</label>
+        <input
+          type="text"
+          placeholder={t('form.phonePlaceholder')}
+          value={phone} onChange={handlePhoneChange}
         />
 
         <span>
@@ -117,7 +111,9 @@ export default function UserForm({ user, onSave, locations }) {  // locations в
           </div>
         )}
 
-        <button type="submit">{t('userForm.save')}</button>
+        <button type="submit" className="mt-4 bg-primary text-white px-6 py-2 rounded">
+          {t('userForm.save')}
+        </button>
       </form>
     </div>
   );

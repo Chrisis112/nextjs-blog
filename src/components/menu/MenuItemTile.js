@@ -14,7 +14,7 @@ export default function MenuItemTile({ onAddToCart, ...item }) {
     extraIngredientPrices = [],
     temperature = [],
     pricePoints,
-    locations // поле с локациями (может быть массив или строка)
+    locations
   } = item;
 
   const hasSizesOrExtras =
@@ -22,7 +22,6 @@ export default function MenuItemTile({ onAddToCart, ...item }) {
 
   const currentLang = i18n.language;
 
-  // Универсальная функция для вывода текста с учётом типа
   const getLocalizedText = (field) => {
     if (!field) return '';
     return typeof field === 'string'
@@ -30,7 +29,6 @@ export default function MenuItemTile({ onAddToCart, ...item }) {
       : (field[currentLang] || field['ru'] || '');
   };
 
-  // Формируем строку по локациям, если есть
   let locationsText = "";
   if (locations && (Array.isArray(locations) ? locations.length : locations)) {
     if (Array.isArray(locations)) {
@@ -42,48 +40,93 @@ export default function MenuItemTile({ onAddToCart, ...item }) {
 
   return (
     <div
-      className="bg-gray-200 p-4 rounded-lg text-center
-        group hover:bg-white hover:shadow-md hover:shadow-black/25 transition-all"
+      className="bg-gray-200 p-4 rounded-lg text-center group hover:bg-white hover:shadow-md hover:shadow-black/25 transition-all flex flex-col justify-between mx-auto"
+      style={{
+        width: "100%",
+        maxWidth: "300px",
+        minHeight: "460px",
+        maxHeight: "460px",
+        boxSizing: "border-box",
+      }}
     >
-      <div
-        className="mx-auto mb-3"
-        style={{
-          width: "180px",  // ширина карточки
-          height: "180px", // высота карточки
-          position: "relative",
-          borderRadius: "8px",
-          overflow: "hidden"
-        }}
-      >
-        <Image
-          src={image || "/default-image.png"}
-          alt={getLocalizedText(name)}
-          fill
-          style={{ objectFit: "cover" }}
-          sizes="180px"
-        />
+      {/* Верхний контент */}
+      <div className="flex flex-col items-center">
+        <div
+          className="mx-auto mb-3"
+          style={{
+            width: "180px",
+            height: "180px",
+            position: "relative",
+            borderRadius: "8px",
+            overflow: "hidden"
+          }}
+        >
+          <Image
+            src={image || "/default-image.png"}
+            alt={getLocalizedText(name)}
+            fill
+            style={{ objectFit: "cover" }}
+            sizes="180px"
+          />
+        </div>
+
+        <h4
+          className="font-semibold text-xl mb-2 text-center"
+          style={{
+            minHeight: "60px",
+            maxHeight: "60px",
+            overflow: "hidden",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            textOverflow: "ellipsis",
+            lineHeight: "1.5"
+          }}
+        >
+          {getLocalizedText(name)}
+        </h4>
+
+        {locationsText && (
+          <div className="text-sm text-gray-600 mb-2 px-2"
+            style={{
+              minHeight: "20px",
+              maxHeight: "20px",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap"
+            }}
+          >
+            {locationsText}
+          </div>
+        )}
+
+        <p
+          className="text-gray-500 text-sm mb-4 px-2"
+          style={{
+            minHeight: "60px",
+            maxHeight: "60px",
+            overflow: "hidden",
+            display: "-webkit-box",
+            WebkitLineClamp: 4,
+            WebkitBoxOrient: "vertical",
+            textOverflow: "ellipsis",
+            lineHeight: "1.3"
+          }}
+        >
+          {getLocalizedText(description)}
+        </p>
       </div>
 
-      <h4 className="font-semibold text-xl mb-1">
-        {getLocalizedText(name)}
-      </h4>
-
-      {/* Вывод локаций, если есть */}
-      {locationsText && (
-        <div className="text-sm text-gray-600 mb-1">{locationsText}</div>
-      )}
-
-      <p className="text-gray-500 text-sm line-clamp-3 mb-3">
-        {getLocalizedText(description)}
-      </p>
-
-      <AddToCartButton
-        image={image}
-        hasSizesOrExtras={hasSizesOrExtras}
-        onClick={onAddToCart}
-        basePrice={basePrice}
-        PricePoints={pricePoints}
-      />
+      {/* Кнопка внизу */}
+      <div className="mt-auto">
+        <AddToCartButton
+          image={image}
+          hasSizesOrExtras={hasSizesOrExtras}
+          onClick={onAddToCart}
+          basePrice={basePrice}
+          PricePoints={pricePoints}
+        />
+      </div>
     </div>
   );
 }
