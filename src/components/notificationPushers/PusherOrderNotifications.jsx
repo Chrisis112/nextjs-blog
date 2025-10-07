@@ -74,13 +74,16 @@ export default function PusherOrderNotifications({ seller }) {
     channel.bind('pusher:subscription_error', (error) => {});
 
 channel.bind("order-paid", (data) => {
-  const orderLocation = data.order.cartProducts?.[0]?.location;
-  if (
-    (Array.isArray(seller.locations) && seller.locations.includes(orderLocation)) ||
-    (typeof seller.location === 'string' && seller.location === orderLocation)
-  ) {
-    showPersistentSoundToast(data.order);
-  }
+const orderLocations = Array.isArray(data.order.location)
+  ? data.order.location
+  : [data.order.location];
+
+if (
+  (Array.isArray(seller.locations) && orderLocations.some(loc => seller.locations.includes(loc))) ||
+  (typeof seller.location === 'string' && orderLocations.includes(seller.location))
+) {
+  showPersistentSoundToast(data.order);
+}
 });
 
 

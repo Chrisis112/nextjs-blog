@@ -23,11 +23,21 @@ const { cartProducts, address, location } = await req.json();
   const userEmail = session?.user?.email;
 
   const orderNumber = await generateOrderNumber();
+const locationSet = new Set();
+for (const product of cartProducts) {
+  // Локация может быть строкой или массивом
+  if (Array.isArray(product.location)) {
+    product.location.forEach(loc => locationSet.add(loc));
+  } else if (product.location) {
+    locationSet.add(product.location);
+  }
+}
+const orderLocations = Array.from(locationSet)
 
   const orderDoc = await Order.create({
     userEmail,
     ...address,
-    location,
+    location: orderLocations,
     cartProducts,
     paid: false,
     orderNumber,
@@ -80,7 +90,7 @@ for (const cartProduct of cartProducts) {
     cancel_url: `${process.env.NEXTAUTH_URL}/cart?canceled=1`,
     metadata: { orderId: orderDoc._id.toString() },
     payment_intent_data: {
-      metadata: { orderId: orderDoc._id.toString() },
+     metadata: { orderId: orderDoc._id.toString() },
     },
   });
 

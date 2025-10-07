@@ -67,15 +67,16 @@ async function sendFirebaseNotifications(order, tokens) {
     return;
   }
 
-  const message = {
-    notification: {
-      title: "Новый заказ",
-      body: `Заказ №${order.orderNumber} ожидает обработки`,
-    },
-    data: {
-      orderId: order._id.toString(),
-    },
-  };
+const message = {
+  notification: {
+    title: "Новый заказ",
+    body: `Заказ №${order.orderNumber} ожидает обработки`,
+  },
+  data: {
+    orderId: order._id.toString(),
+    location: JSON.stringify(order.location), // Отправлять как строку, если массив!
+  },
+};
 
   try {
     if (!admin.messaging) {
@@ -244,11 +245,11 @@ export async function POST(req) {
         }
 
         try {
-          const orderLocation = updatedOrder.cartProducts?.[0]?.location;
+          const orderLocation = updatedOrder.location;
 const sellers = await UserInfo.find({
   seller: true,
   fcmTokens: { $exists: true, $ne: [] },
-  location: orderLocation,
+  locations: { $in: orderLocation }, // находит любого продавца хотя бы в одной локации из заказа
 });
 
 
