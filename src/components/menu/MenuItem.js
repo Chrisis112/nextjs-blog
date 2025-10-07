@@ -41,10 +41,14 @@ export default function MenuItem(menuItem) {
       setShowPopup(true);
       return;
     }
-    addToCart(
-      { ...menuItem, selectedLocation }, // передаем выбранную локацию
-      selectedSize, selectedExtras, selectedTemperature
-    );
+addToCart(
+  { ...menuItem }, // базовый товар
+  selectedSize,
+  selectedExtras,
+  selectedTemperature,
+  selectedLocation // отдельным параметром!
+);
+
     await new Promise(resolve => setTimeout(resolve, 1000));
     setShowPopup(false);
   }

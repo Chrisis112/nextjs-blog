@@ -77,14 +77,14 @@ export function AppProvider({children}) {
     }
   }
 
-  function addToCart(product, size=null, extras=[], temperature=[]) {
-    setCartProducts(prevProducts => {
-      const cartProduct = {...product, size, temperature, extras};
-      const newProducts = [...prevProducts, cartProduct];
-      saveCartProductsToLocalStorage(newProducts);
-      return newProducts;
-    });
-  }
+function addToCart(product, size=null, extras=[], temperature=[], location='') {
+  setCartProducts(prevProducts => {
+    const cartProduct = { ...product, size, temperature, extras, location };
+    const newProducts = [...prevProducts, cartProduct];
+    saveCartProductsToLocalStorage(newProducts);
+    return newProducts;
+  });
+}
 
   return (
     <SessionProvider>
