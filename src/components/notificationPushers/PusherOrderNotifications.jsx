@@ -63,9 +63,16 @@ export default function PusherOrderNotifications({ seller }) {
     if (shownOrderIds.has(order._id)) return;
 
     // Убираем проверку локации, если нужно показывать просто все уведомления с бекенда
-    setShownOrderIds(prev => new Set(prev).add(order._id));
+  setShownOrderIds(prev => {
+    if (prev.has(order._id)) {
+      return prev; // Уже показано, не показываем опять
+    }
     showPersistentSoundToast(order);
-  }, [shownOrderIds, showPersistentSoundToast]);
+    const newSet = new Set(prev);
+    newSet.add(order._id);
+    return newSet;
+  });
+}, []);
 
   useEffect(() => {
   if (!seller || !seller.email || !seller.seller) {

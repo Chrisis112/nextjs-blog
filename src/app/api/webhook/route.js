@@ -55,8 +55,6 @@ const stripe = require("stripe")(process.env.STRIPE_SK);
 
 // Функция отправки пуш-уведомлений через Firebase
 async function sendFirebaseNotifications(order, tokens) {
-  console.log("sendFirebaseNotifications called with", tokens.length, "tokens");
-
   if (!firebaseInitialized) {
     console.error("Firebase not initialized, skipping notifications");
     return;
@@ -67,91 +65,51 @@ async function sendFirebaseNotifications(order, tokens) {
     return;
   }
 
+  const validTokens = tokens.filter(token => typeof token === "string" && token.trim().length > 0);
+
+  if (validTokens.length === 0) {
+    console.log("No valid tokens found");
+    return;
+  }
+
   const message = {
+    tokens: validTokens,
     notification: {
       title: "Новый заказ",
       body: `Заказ №${order.orderNumber} ожидает обработки`,
     },
     data: {
       orderId: order._id.toString(),
-      location: JSON.stringify(order.location), // Добавляем location в data
+      location: JSON.stringify(order.location),
+    },
+    android: {
+      notification: {
+        sound: 'default',
+        click_action: 'FLUTTER_NOTIFICATION_CLICK', // или ваша логика
+      },
+    },
+    webpush: {
+      headers: {
+        Urgency: 'high',
+      },
+      notification: {
+        sound: 'default',
+        requireInteraction: 'true',
+      },
     },
   };
 
   try {
-    if (!admin.messaging) {
-      console.error("Firebase messaging not available");
-      return;
-    }
+    const response = await admin.messaging().sendMulticast(message);
 
-    const validTokens = tokens.filter(
-      (token) => token && typeof token === "string" && token.trim().length > 0
-    );
-    if (validTokens.length === 0) {
-      console.log("No valid tokens found");
-      return;
-    }
-    console.log(`Sending to ${validTokens.length} valid tokens`);
-
-    let response;
-    if (typeof admin.messaging().sendEachForMulticast === "function") {
-      response = await admin.messaging().sendEachForMulticast({
-        ...message,
-        tokens: validTokens,
-      });
-    } else if (typeof admin.messaging().sendMulticast === "function") {
-      response = await admin.messaging().sendMulticast({
-        ...message,
-        tokens: validTokens,
-      });
-    }
-
-    if (!response) {
-      console.log("Using individual send method");
-      let successCount = 0;
-      let failureCount = 0;
-      for (const token of validTokens) {
-        try {
-          await admin.messaging().send({ ...message, token });
-          successCount++;
-          console.log(`Firebase push sent to token: ${token.slice(0, 20)}...`);
-        } catch (err) {
-          failureCount++;
-          console.error(
-            `Failed to send to token ${token.slice(0, 20)}...: `,
-            err.code || err.message
-          );
-          if (
-            err.code === "messaging/registration-token-not-registered" ||
-            err.code === "messaging/invalid-registration-token"
-          ) {
-            await UserInfo.updateMany(
-              { fcmTokens: token },
-              { $pull: { fcmTokens: token } }
-            );
-          }
-        }
-      }
-      console.log(
-        `Individual send completed: ${successCount} success, ${failureCount} failures`
-      );
-      return;
-    }
-
-    console.log(
-      `Firebase push sent: ${response.successCount} messages sent successfully.`
-    );
+    console.log(`Firebase push sent: ${response.successCount} messages sent successfully.`);
 
     if (response.failureCount > 0) {
-      console.log(`${response.failureCount} messages failed to send`);
       const invalidTokens = [];
       response.responses.forEach((resp, idx) => {
         if (!resp.success) {
           const errorCode = resp.error?.code || "";
-          console.error(
-            `Failed to send to token ${validTokens[idx].slice(0, 20)}...:`,
-            errorCode
-          );
+          console.error(`Failed to send to token ${validTokens[idx].slice(0, 20)}...:`, errorCode);
 
           if (
             errorCode === "messaging/registration-token-not-registered" ||
@@ -175,6 +133,7 @@ async function sendFirebaseNotifications(order, tokens) {
     console.error("Error sending Firebase push:", error.code || error.message);
   }
 }
+
 
 export async function POST(req) {
   const sig = req.headers.get('stripe-signature');
