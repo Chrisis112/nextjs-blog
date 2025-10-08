@@ -22,8 +22,8 @@ export default function ClientSideComponents() {
 
   return (
     <>
-      <PusherOrderNotifications seller={profile?.seller} />
-      <FirebaseNotifications userSeller={profile?.seller} />
+<PusherOrderNotifications seller={profile} />
+      <FirebaseNotifications userSeller={profile} />
     </>
   );
 }

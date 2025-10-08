@@ -5,8 +5,6 @@ import {useProfile} from "@/components/UseProfile";
 import {dbTimeForHuman} from "@/libs/datetime";
 import Link from "next/link";
 import {useEffect, useState, useRef} from "react";
-import 'react-toastify/dist/ReactToastify.css';
-import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 
 
@@ -54,52 +52,9 @@ export default function OrdersPage() {
     : (field[currentLang] || field['ru'] || '');
 };
 
-  // Toast + loop sound функция для показа
-  function showPersistentSoundToast(order) {
-    let audio = new Audio('/mixkit-bell-notification-933.wav');
-    audio.loop = true;
-    audio.play();
-
-    toast(
-      ({ closeToast }) => (
-        <div>
-          <div>Новый заказ: <b>  {order.cartProducts.map(p => getLocalizedText(p.name, i18n.language)).join(', ')}</b></div>
-          <div style={{ marginTop: 12 }}>
-            <button
-              className="bg-green-600 text-white px-2 py-1 rounded"
-              onClick={() => {
-                audio.pause();
-                audio.currentTime = 0;
-                closeToast();
-              }}
-            >
-              Принять
-            </button>
-          </div>
-        </div>
-      ), {
-        autoClose: false,
-        position: 'top-right',
-        closeOnClick: false,
-        onClose: () => {
-          audio.pause();
-          audio.currentTime = 0;
-        }
-      });
-  }
 
   return (
     <section className="mt-8 max-w-2xl mx-auto">
-      <button
-        onClick={() => showPersistentSoundToast({
-          _id: 'test-order',
-          cartProducts: [{ name: 'Тестовая позиция' }]
-        })}
-        className="mb-4 px-4 py-2 bg-blue-600 text-white rounded"
-      >
-        Тестировать toast с loop-звуком
-      </button>
-
       <UserTabs isSeller={true} isAdmin={profile?.admin} />
 
       <div className="mt-8">

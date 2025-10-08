@@ -58,24 +58,6 @@ console.log('Sending FCM token with Authorization:', session.accessToken);
     }
   }
 
-useEffect(() => {
-  async function fetchAndUpdateToken() {
-    try {
-      const messaging = getMessaging(firebaseApp);
-      const vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
-      const currentToken = await getToken(messaging, { vapidKey });
-      if (currentToken) {
-        await updateFcmTokenOnServer(currentToken);
-      }
-    } catch (err) {
-      console.error("Failed to get FCM token:", err);
-    }
-  }
-  if (status === "authenticated" && session?.accessToken) {
-    fetchAndUpdateToken();
-  }
-}, [status, session?.accessToken]);
-
 
   return (
     <section className="mt-8">

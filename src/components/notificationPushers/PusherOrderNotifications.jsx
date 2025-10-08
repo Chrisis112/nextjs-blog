@@ -1,5 +1,5 @@
 'use client';
-import { useEffect } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import Pusher from "pusher-js";
 import "react-toastify/dist/ReactToastify.css";
@@ -12,17 +12,21 @@ export default function PusherOrderNotifications({ seller }) {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
+  const [shownOrderIds, setShownOrderIds] = useState(new Set());
+
   const getLocalizedText = (field) => {
     if (!field) return '';
-    return typeof field === 'string' 
-      ? field 
+    return typeof field === 'string'
+      ? field
       : (field[i18n.language] || field['ru'] || '');
   };
 
   function showPersistentSoundToast(order) {
     let audio = new Audio('/mixkit-bell-notification-933.wav');
     audio.loop = true;
-    audio.play();
+    audio.play().catch(() => {
+      console.log("Audio play prevented by browser autoplay policy");
+    });
 
     toast(
       ({ closeToast }) => (
@@ -43,19 +47,32 @@ export default function PusherOrderNotifications({ seller }) {
           </div>
         </div>
       ), {
-        autoClose: false,
-        position: 'top-right',
-        closeOnClick: false,
-        onClose: () => {
-          audio.pause();
-          audio.currentTime = 0;
-        }
+      autoClose: false,
+      position: 'top-right',
+      closeOnClick: false,
+      onClose: () => {
+        audio.pause();
+        audio.currentTime = 0;
       }
+    }
     );
   }
 
+  const showNotificationOnce = useCallback((order) => {
+    if (!order?._id) return;
+    if (shownOrderIds.has(order._id)) return;
+
+    // Убираем проверку локации, если нужно показывать просто все уведомления с бекенда
+    setShownOrderIds(prev => new Set(prev).add(order._id));
+    showPersistentSoundToast(order);
+  }, [shownOrderIds, showPersistentSoundToast]);
+
   useEffect(() => {
-    if (!seller) return;
+  if (!seller || !seller.email || !seller.seller) {
+    console.log("No valid seller data or email, skipping setup");
+    return;
+  }
+
     Pusher.logToConsole = true;
 
     const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY, {
@@ -63,38 +80,43 @@ export default function PusherOrderNotifications({ seller }) {
       forceTLS: true,
     });
 
-    pusher.connection.bind('connected', () => {});
+    pusher.connection.bind('connected', () => {
+      console.log("Pusher connected");
+    });
 
-    pusher.connection.bind('error', (error) => {});
+    const channelName = `orders-channel-${seller.email}`;
+    console.log("Subscribing to channel:", channelName);
+    const channel = pusher.subscribe(channelName);
 
-    const channel = pusher.subscribe("orders-channel");
-    
-    channel.bind('pusher:subscription_succeeded', () => {});
+    channel.bind("order-paid", (data) => {
+      console.log("Pusher event received:", data);
+      showNotificationOnce(data.order);
+    });
 
-    channel.bind('pusher:subscription_error', (error) => {});
-
-channel.bind("order-paid", (data) => {
-const orderLocations = Array.isArray(data.order.location)
-  ? data.order.location
-  : [data.order.location];
-
-if (
-  (Array.isArray(seller.locations) && orderLocations.some(loc => seller.locations.includes(loc))) ||
-  (typeof seller.location === 'string' && orderLocations.includes(seller.location))
-) {
-  showPersistentSoundToast(data.order);
-}
-});
-
-
-    // Firebase Messaging subscription for push notifications in foreground
     const messaging = getMessaging(firebaseApp);
     const unsubscribeFirebase = onMessage(messaging, (payload) => {
       console.log('Firebase message received: ', payload);
-      showPersistentSoundToast({
-        _id: payload.data?.orderId || 'firebase',
-        cartProducts: [{ name: payload.notification?.title || 'Новый заказ' }]
-      });
+
+      let payloadLocations;
+      if (Array.isArray(payload.data?.location)) {
+        payloadLocations = payload.data.location;
+      } else if (typeof payload.data?.location === 'string') {
+        try {
+          payloadLocations = JSON.parse(payload.data.location);
+        } catch {
+          payloadLocations = [payload.data.location];
+        }
+      } else {
+        payloadLocations = [];
+      }
+
+      const firebaseOrder = {
+        _id: payload.data?.orderId || `firebase-${Date.now()}`,
+        cartProducts: [{ name: payload.notification?.title || 'Новый заказ' }],
+        location: payloadLocations,
+      };
+
+      showNotificationOnce(firebaseOrder);
     });
 
     return () => {
@@ -103,7 +125,7 @@ if (
       pusher.disconnect();
       unsubscribeFirebase();
     };
-  }, [seller, router]);
+  }, [seller?.email, showNotificationOnce]);
 
   return <ToastContainer position="top-right" />;
 }

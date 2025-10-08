@@ -19,6 +19,9 @@ const requiredFirebaseEnvs = [
 ];
 const missingEnvs = requiredFirebaseEnvs.filter((env) => !process.env[env]);
 if (missingEnvs.length > 0) {
+  console.error("Missing Firebase environment variables:", missingEnvs);
+} else {
+  console.log("All Firebase environment variables present");
 }
 
 // Инициализация Firebase Admin SDK
@@ -27,12 +30,9 @@ if (missingEnvs.length === 0 && !admin.apps.length) {
   try {
     let privateKey = process.env.FIREBASE_PRIVATE_KEY;
 
-    // Уберем начальные и конечные кавычки, если есть
     if (privateKey.startsWith('"') && privateKey.endsWith('"')) {
       privateKey = privateKey.slice(1, -1);
     }
-
-    // Правильно заменяем экранированные переносы строк
     privateKey = privateKey.replace(/\\n/g, "\n");
 
     admin.initializeApp({
@@ -67,16 +67,16 @@ async function sendFirebaseNotifications(order, tokens) {
     return;
   }
 
-const message = {
-  notification: {
-    title: "Новый заказ",
-    body: `Заказ №${order.orderNumber} ожидает обработки`,
-  },
-  data: {
-    orderId: order._id.toString(),
-    location: JSON.stringify(order.location), // Отправлять как строку, если массив!
-  },
-};
+  const message = {
+    notification: {
+      title: "Новый заказ",
+      body: `Заказ №${order.orderNumber} ожидает обработки`,
+    },
+    data: {
+      orderId: order._id.toString(),
+      location: JSON.stringify(order.location), // Добавляем location в data
+    },
+  };
 
   try {
     if (!admin.messaging) {
@@ -107,7 +107,6 @@ const message = {
     }
 
     if (!response) {
-      // fallback: индивидуальная отправка
       console.log("Using individual send method");
       let successCount = 0;
       let failureCount = 0;
@@ -122,7 +121,6 @@ const message = {
             `Failed to send to token ${token.slice(0, 20)}...: `,
             err.code || err.message
           );
-          // Удаляем недействительный токен
           if (
             err.code === "messaging/registration-token-not-registered" ||
             err.code === "messaging/invalid-registration-token"
@@ -131,7 +129,6 @@ const message = {
               { fcmTokens: token },
               { $pull: { fcmTokens: token } }
             );
-            console.log(`Removed invalid token from database: ${token.slice(0, 20)}...`);
           }
         }
       }
@@ -156,7 +153,6 @@ const message = {
             errorCode
           );
 
-          // Помечаем токен для удаления, если ошибка указывает на недействительный токен
           if (
             errorCode === "messaging/registration-token-not-registered" ||
             errorCode === "messaging/invalid-registration-token" ||
@@ -168,7 +164,6 @@ const message = {
       });
 
       if (invalidTokens.length > 0) {
-        // Удаляем все недействительные токены из БД
         await UserInfo.updateMany(
           { fcmTokens: { $in: invalidTokens } },
           { $pull: { fcmTokens: { $in: invalidTokens } } }
@@ -181,7 +176,6 @@ const message = {
   }
 }
 
-
 export async function POST(req) {
   const sig = req.headers.get('stripe-signature');
   let event;
@@ -193,82 +187,90 @@ export async function POST(req) {
   } catch (e) {
     console.error('stripe error');
     return Response.json(e, {status: 400});
-    
   }
 
   if (event.type === 'checkout.session.completed') {
-      const orderId = event?.data?.object?.metadata?.orderId;
-      const isPaid = event?.data?.object?.payment_status === "paid";
-      const userEmail = event?.data?.object?.customer_details?.email;
+    const orderId = event?.data?.object?.metadata?.orderId;
+    const isPaid = event?.data?.object?.payment_status === "paid";
+    const userEmail = event?.data?.object?.customer_details?.email;
 
-      console.log("Processing checkout.session.completed:", {
-        orderId,
-        isPaid,
-        userEmail,
-      });
+    console.log("Processing checkout.session.completed:", {
+      orderId,
+      isPaid,
+      userEmail,
+    });
 
-      if (!orderId || !userEmail) {
-        console.error("Missing orderId or userEmail:", { orderId, userEmail });
-        return new Response(
-          JSON.stringify({ error: "Missing orderId or userEmail" }),
-          { status: 400, headers: { "Content-Type": "application/json" } }
-        );
-      }
+    if (!orderId || !userEmail) {
+      console.error("Missing orderId or userEmail:", { orderId, userEmail });
+      return new Response(
+        JSON.stringify({ error: "Missing orderId or userEmail" }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
 
-      const user = await UserInfo.findOne({ email: userEmail });
-      if (!user) {
-        console.error("User not found:", userEmail);
-        return new Response(
-          JSON.stringify({ error: "User not found" }),
-          { status: 404, headers: { "Content-Type": "application/json" } }
-        );
-      }
+    const user = await UserInfo.findOne({ email: userEmail });
+    if (!user) {
+      console.error("User not found:", userEmail);
+    }
 
-      const paymentAmount = event?.data?.object?.amount_total / 100;
-      const pointsEarned = Math.floor(paymentAmount);
+    const paymentAmount = event?.data?.object?.amount_total / 100;
+    const pointsEarned = Math.floor(paymentAmount);
 
     if (isPaid) {
+      // Обновляем заказ и начисляем бонусы (ИСПРАВЛЕНО: user._id вместо user)
+      await Order.updateOne({_id: orderId}, { paid: true });
+      await UserInfo.updateOne({_id: user._id}, { $inc: { points: pointsEarned } });
+
+      // Получаем обновленный заказ из базы
+      const updatedOrder = await Order.findById(orderId);
+      console.log("Order updated successfully:", updatedOrder.orderNumber);
       
-      await Order.updateOne({_id:orderId}, {paid:true});
-      await UserInfo.updateOne( {_id:user},{ $inc: { points: pointsEarned } }, { new: true });
-    }
-        const updatedOrder = await Order.findById(orderId);
-        console.log("Order updated successfully:", updatedOrder.orderNumber);
+      const orderLocations = Array.isArray(updatedOrder.location)
+        ? updatedOrder.location
+        : [updatedOrder.location];
 
-        try {
-          await pusher.trigger("orders-channel", "order-paid", {
-            order: updatedOrder,
-          });
-          console.log("Pusher notification sent successfully");
-        } catch (err) {
-          console.error("Pusher notification failed:", err.message);
+      console.log("Looking for sellers with seller:true and location in:", orderLocations);
+
+      // ОДИН запрос к базе для получения продавцов
+      const sellers = await UserInfo.find({
+        seller: true,
+        location: { $in: orderLocations },
+      });
+
+      console.log(`Found ${sellers.length} sellers matching location`);
+
+      // Отправляем Pusher уведомления
+      try {
+        for (const seller of sellers) {
+await pusher.trigger(`orders-channel-${seller.email}`, "order-paid", { order: updatedOrder });
+
+  console.log(`Pusher notification sent to seller: ${seller.email}`);
         }
-
-        try {
-          const orderLocation = updatedOrder.location;
-const sellers = await UserInfo.find({
-  seller: true,
-  fcmTokens: { $exists: true, $ne: [] },
-  locations: { $in: orderLocation }, // находит любого продавца хотя бы в одной локации из заказа
-});
-
-
-          const allFcmTokens = sellers.flatMap((seller) => seller.fcmTokens || []);
-          console.log(
-            `Found ${sellers.length} sellers with ${allFcmTokens.length} total FCM tokens`
-          );
-
-          if (allFcmTokens.length > 0) {
-            await sendFirebaseNotifications(updatedOrder, allFcmTokens);
-          } else {
-            console.log("No FCM tokens found, skipping Firebase notifications");
-          }
-        } catch (error) {
-          console.error("Error in Firebase notification process:", error);
-        }
+        console.log("All Pusher notifications sent successfully");
+      } catch (err) {
+        console.error("Pusher notification failed:", err.message);
       }
 
+      // Отправляем Firebase уведомления (только тем, у кого есть токены)
+      try {
+        const sellersWithTokens = sellers.filter(seller => 
+          seller.fcmTokens && seller.fcmTokens.length > 0
+        );
+        
+        const allFcmTokens = sellersWithTokens.flatMap(seller => seller.fcmTokens || []);
+        console.log(`Found ${sellersWithTokens.length} sellers with ${allFcmTokens.length} FCM tokens`);
+
+        if (allFcmTokens.length > 0) {
+          console.log("Sending Firebase notifications");
+          await sendFirebaseNotifications(updatedOrder, allFcmTokens);
+        } else {
+          console.log("No FCM tokens found for notification, skipping Firebase");
+        }
+      } catch (error) {
+        console.error("Error sending Firebase notifications:", error);
+      }
+    }
+  }
 
   return Response.json('ok', {status: 200});
-  
 }
