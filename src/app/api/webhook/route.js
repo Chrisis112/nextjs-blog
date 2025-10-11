@@ -2,6 +2,9 @@ import { Order } from "@/models/Order";
 import { UserInfo } from "@/models/UserInfo";
 import Pusher from "pusher";
 import admin from "firebase-admin";
+import { getMessaging } from "firebase-admin/messaging";
+
+
 
 const pusher = new Pusher({
   appId: process.env.PUSHER_APP_ID,
@@ -100,7 +103,7 @@ async function sendFirebaseNotifications(order, tokens) {
   };
 
   try {
-    const response = await admin.messaging().sendMulticast(message);
+    const response = await getMessaging().sendEachForMulticast(message)
 
     console.log(`Firebase push sent: ${response.successCount} messages sent successfully.`);
 

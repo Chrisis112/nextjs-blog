@@ -8,7 +8,7 @@ import { useSession } from 'next-auth/react';
 
 export default function FirebaseNotifications({ userSeller }) {
   const { t } = useTranslation();
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
 
   const [permissionRequested, setPermissionRequested] = useState(false);
   const [showPrompt, setShowPrompt] = useState(false);
@@ -38,35 +38,13 @@ export default function FirebaseNotifications({ userSeller }) {
     }
   }, [userSeller, messaging]);
 
-  // Обработка foreground уведомлений
+  // Подписка на foreground сообщения - НЕ показываем уведомления вручную чтобы не дублировать
   useEffect(() => {
     if (!messaging || !userSeller) return;
-
-const unsubscribe = onMessage(messaging, (payload) => {
-  console.log('Foreground message received:', payload);
-
-  // определяем location заказа из payload
-  const orderLocation = data.order.cartProducts?.[0]?.location;
-
-  // проверяем продавца (userSeller)
-  if (
-    userSeller &&
-    (
-      (Array.isArray(userSeller.locations) && userSeller.locations.includes(orderLocation)) ||
-      userSeller.location === orderLocation
-    )
-  ) {
-    if (Notification.permission === 'granted') {
-      new Notification(payload.notification?.title || 'Уведомление', {
-        body: payload.notification?.body || '',
-        icon: '/firebase-logo.png',
-        data: payload.data
-      });
-    }
-  }
-});
-
-
+    const unsubscribe = onMessage(messaging, (payload) => {
+      console.log('Foreground message received:', payload);
+      // Здесь можно добавить кастомные UI уведомления (toast и т.п.), но системные пуши показывает SW
+    });
     return () => unsubscribe();
   }, [messaging, userSeller]);
 
@@ -75,7 +53,7 @@ const unsubscribe = onMessage(messaging, (payload) => {
 
     try {
       const currentToken = await getToken(messaging, { 
-        vapidKey: 'BH8KgBCfJ5qU...' // ВАШ РЕАЛЬНЫЙ VAPID КЛЮЧ
+        vapidKey: 'BO15x114yYqftFyLlDcR6R3aHMVVuCup1MUlAsSq_TOQWi5sK-C7bwpYwCd840n2vG-qWOWJYhhPRrdmU6aknFc'
       });
 
       if (currentToken) {
@@ -85,18 +63,15 @@ const unsubscribe = onMessage(messaging, (payload) => {
         console.log('No registration token available.');
       }
     } catch (err) {
-      console.log('An error occurred while retrieving token:', err);
+      console.log('Error retrieving token:', err);
     }
   }
 
   async function sendTokenToServer(token) {
+    if (!session || !session.accessToken) return;
+
     try {
-      if (!session || !session.accessToken) {
-        console.warn('No access token in session!');
-        return;
-      }
-      
-      const response = await fetch('/api/save-fcm-token', {
+      const res = await fetch('/api/save-fcm-token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -104,36 +79,27 @@ const unsubscribe = onMessage(messaging, (payload) => {
         },
         body: JSON.stringify({ token }),
       });
-
-      if (response.ok) {
-        console.log('FCM Token sent to server successfully');
+      if (res.ok) {
+        console.log('Token sent successfully');
       } else {
-        console.error('Failed to send FCM token:', await response.text());
+        console.error('Failed to send token:', await res.text());
       }
     } catch (error) {
-      console.error('Error sending FCM token to server:', error);
+      console.error('Error sending token:', error);
     }
   }
 
   async function requestPermissionAndSubscribe() {
-    if (!firebaseApp) {
-      console.warn('Firebase не инициализирован');
-      return;
-    }
+    if (!firebaseApp) return;
 
-    try {
-      const permission = await Notification.requestPermission();
-      setPermissionRequested(true);
-      setShowPrompt(false);
+    const permission = await Notification.requestPermission();
+    setPermissionRequested(true);
+    setShowPrompt(false);
 
-      if (permission !== 'granted') {
-        console.log('Permission not granted for notifications');
-        return;
-      }
-
+    if (permission === 'granted') {
       await initializeToken();
-    } catch (err) {
-      console.log('An error occurred while requesting permission:', err);
+    } else {
+      console.log('Notification permission not granted');
     }
   }
 

@@ -35,7 +35,6 @@ export default function Home() {
             },
             body: JSON.stringify({ token }),
           });
-          console.log('FCM token updated from Home page');
         }
       } catch (error) {
         console.error('Failed to update FCM token from Home:', error);

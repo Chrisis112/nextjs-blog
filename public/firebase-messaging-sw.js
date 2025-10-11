@@ -47,6 +47,7 @@ self.addEventListener('push', (event) => {
         icon: payload.notification?.icon || '/firebase-logo.png',
         badge: payload.notification?.badge || '/firebase-badge.png',
         data: payload.data, // можно использовать для обработки клика по уведомлению
+        sound: "/mixkit-bell-notification-933.wav"
       };
 
       // Показываем системное уведомление
