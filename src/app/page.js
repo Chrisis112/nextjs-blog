@@ -20,8 +20,10 @@ export default function Home() {
 
   useEffect(() => {
     async function sendFcmToken() {
-      if (!session || !session.accessToken) return;
-
+if (!session?.accessToken || session.accessToken.length < 20) {
+  console.warn('Нет валидного accessToken, ждём авторизации');
+  return; // Не отправляем, пока пользователь не авторизован
+}
       try {
         const messaging = getMessaging(firebaseApp);
         const VAPID_KEY = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
