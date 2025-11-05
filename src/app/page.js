@@ -29,6 +29,8 @@ if (!session?.accessToken || session.accessToken.length < 20) {
         const VAPID_KEY = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
          const token = await getToken(messaging, { vapidKey: VAPID_KEY });
         if (token) {
+          console.log('Session:', session);
+console.log('accessToken перед отправкой:', session?.accessToken);
           await fetch('/api/save-fcm-token', {
             method: 'POST',
             headers: {
