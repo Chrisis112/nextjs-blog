@@ -68,17 +68,10 @@ export default function FirebaseNotifications({ userSeller }) {
   }
 
  async function sendTokenToServer(token) {
-  // Проверьте наличие session и accessToken
-  if (!session || !session.accessToken || typeof session.accessToken !== 'string' || session.accessToken.length < 10) {
-    console.warn('No valid access token in session!', session);
-    return;
+  if (!session || !session.accessToken || session.accessToken.length < 20) {
+    console.warn('User not authenticated. Waiting for login before sending FCM token.');
+    return; // Не отправляем токен, пока пользователь не авторизован
   }
-
-  // Логируем всё для дебага
-  console.log("Sending FCM token to server!", {
-    token,
-    authorization: `Bearer ${session.accessToken}`
-  });
 
   try {
     const response = await fetch('/api/save-fcm-token', {
@@ -90,15 +83,19 @@ export default function FirebaseNotifications({ userSeller }) {
       body: JSON.stringify({ token }),
     });
 
-    if (response.ok) {
-      console.log('FCM Token sent to server successfully');
+    if (!response.ok) {
+      if (response.status === 401) {
+        console.warn('Unauthorized. User might need to log in first.');
+        // Здесь можно дополнительно триггерить логику повторной авторизации или показать UI
+        return;
+      }
+      const errorText = await response.text();
+      console.error('Failed to send FCM token:', errorText);
     } else {
-      // Читаем ошибку и выводим ее полностью
-      const text = await response.text();
-      console.error('Failed to send FCM token:', text);
+      console.log('FCM token sent successfully');
     }
-  } catch (error) {
-    console.error('Error sending FCM token to server:', error);
+  } catch (err) {
+    console.error('Error while sending FCM token:', err);
   }
 }
 
