@@ -67,27 +67,41 @@ export default function FirebaseNotifications({ userSeller }) {
     }
   }
 
-  async function sendTokenToServer(token) {
-    if (!session || !session.accessToken) return;
-
-    try {
-      const res = await fetch('/api/save-fcm-token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.accessToken}`,
-        },
-        body: JSON.stringify({ token }),
-      });
-      if (res.ok) {
-        console.log('Token sent successfully');
-      } else {
-        console.error('Failed to send token:', await res.text());
-      }
-    } catch (error) {
-      console.error('Error sending token:', error);
-    }
+ async function sendTokenToServer(token) {
+  // Проверьте наличие session и accessToken
+  if (!session || !session.accessToken || typeof session.accessToken !== 'string' || session.accessToken.length < 10) {
+    console.warn('No valid access token in session!', session);
+    return;
   }
+
+  // Логируем всё для дебага
+  console.log("Sending FCM token to server!", {
+    token,
+    authorization: `Bearer ${session.accessToken}`
+  });
+
+  try {
+    const response = await fetch('/api/save-fcm-token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.accessToken}`,
+      },
+      body: JSON.stringify({ token }),
+    });
+
+    if (response.ok) {
+      console.log('FCM Token sent to server successfully');
+    } else {
+      // Читаем ошибку и выводим ее полностью
+      const text = await response.text();
+      console.error('Failed to send FCM token:', text);
+    }
+  } catch (error) {
+    console.error('Error sending FCM token to server:', error);
+  }
+}
+
 
   async function requestPermissionAndSubscribe() {
     if (!firebaseApp) return;
