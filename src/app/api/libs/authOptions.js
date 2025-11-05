@@ -45,23 +45,19 @@ export const authOptions = {
   },
 
 callbacks: {
-  async jwt({ token, user, account }) {
-    if (account?.access_token) {
-      token.accessToken = account.access_token;
-    }
-    if (user) {
-      const tokenJwt = jwt.sign(
-        { sub: user.id, email: user.email },
-        process.env.SECRET,
-        { expiresIn: '7d' }
-      );
-      token.accessToken = tokenJwt;
-    }
-    return token;
-  },
-
+async jwt({ token, user }) {
+  if (user) {
+    const tokenJwt = jwt.sign(
+      { sub: user.id, email: user.email },
+      process.env.SECRET,
+      { expiresIn: '7d' }
+    );
+    token.accessToken = tokenJwt;
+  }
+  return token;
+},
   async session({ session, token }) {
     session.accessToken = token.accessToken;
     return session;
-  }
+  },
 }}

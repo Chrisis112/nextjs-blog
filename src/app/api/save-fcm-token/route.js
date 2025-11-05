@@ -2,8 +2,10 @@ import { UserInfo } from '@/models/UserInfo';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 
+
 // Внимание: если используете Next.js App Router, экспорт должен быть через default!
 export async function POST(req) {
+  
   // Гарантируем соединение с базой
   if (mongoose.connection.readyState !== 1) {
     await mongoose.connect(process.env.MONGO_URL);
