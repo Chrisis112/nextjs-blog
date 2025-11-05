@@ -5,15 +5,11 @@ import jwt from 'jsonwebtoken';
 
 // Внимание: если используете Next.js App Router, экспорт должен быть через default!
 export async function POST(req) {
-  
-  // Гарантируем соединение с базой
   if (mongoose.connection.readyState !== 1) {
     await mongoose.connect(process.env.MONGO_URL);
-    console.log('Connected to MongoDB');
   }
 
   try {
-    // Получаем тело запроса
     const { token } = await req.json();
 
     if (!token || typeof token !== 'string' || token.length < 10) {
@@ -21,43 +17,41 @@ export async function POST(req) {
       return new Response(JSON.stringify({ error: 'Invalid FCM token in request' }), { status: 400 });
     }
 
-    // Получаем JWT из заголовка Authorization
     const authHeader = req.headers.get('Authorization');
+
+    // Если нет токена авторизации — не ругаемся, просто не делаем ничего и возвращаем success
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.error('Unauthorized: Missing or invalid Authorization header');
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+      console.warn('Authorization header missing or invalid, skipping token save');
+      return new Response(JSON.stringify({ success: true, skipped: true, message: 'No authorization token, skipping.' }), { status: 200 });
     }
+
     const jwtToken = authHeader.split(' ')[1];
 
-    // Проверяем токен
     let payload;
     try {
       payload = jwt.verify(jwtToken, process.env.SECRET);
     } catch (e) {
-      console.error('Invalid JWT token:', e);
-      return new Response(JSON.stringify({ error: 'Invalid token' }), { status: 401 });
+      console.warn('Invalid JWT token, skipping save:', e);
+      return new Response(JSON.stringify({ success: true, skipped: true, message: 'Invalid token, skipping.' }), { status: 200 });
     }
 
-    // Убеждаемся, что в токене есть email
     const userEmail = payload.email;
     if (!userEmail || typeof userEmail !== 'string') {
-      console.error('No email in JWT payload');
-      return new Response(JSON.stringify({ error: 'Email not found in token' }), { status: 400 });
+      console.warn('No email in JWT payload, skipping');
+      return new Response(JSON.stringify({ success: true, skipped: true, message: 'No email in token, skipping.' }), { status: 200 });
     }
 
-    // Находим пользователя
     const user = await UserInfo.findOne({ email: userEmail });
     if (!user) {
-      console.error('User not found with email:', userEmail);
-      return new Response(JSON.stringify({ error: 'User not found' }), { status: 404 });
+      console.warn('User not found, skipping token save');
+      return new Response(JSON.stringify({ success: true, skipped: true, message: 'User not found, skipping.' }), { status: 200 });
     }
 
     if (!user.seller) {
-      console.error('User is not a seller:', user.email);
-      return new Response(JSON.stringify({ error: 'User is not a seller' }), { status: 403 });
+      console.warn('User is not a seller, skipping token save');
+      return new Response(JSON.stringify({ success: true, skipped: true, message: 'User is not a seller, skipping.' }), { status: 200 });
     }
 
-    // Добавляем токен только если его еще нет
     await UserInfo.updateOne(
       { email: userEmail },
       { $addToSet: { fcmTokens: token } }
@@ -65,11 +59,12 @@ export async function POST(req) {
 
     return new Response(JSON.stringify({ success: true }), { status: 200 });
 
-  } catch (err) {
-    console.error('Error in POST /api/save-fcm-token:', err);
+  } catch (e) {
+    console.error('Internal server error:', e);
     return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500 });
   }
 }
+
 
 // Если используете Next.js pages/api, используйте
 // export default (req, res) => {...} с аналогичной логикой
