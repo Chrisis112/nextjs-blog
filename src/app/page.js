@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { getMessaging, getToken } from 'firebase/messaging';
 import firebaseApp from '../../firebaseConfig';
-
+import GoogleMap from '@/components/GoogleMap';
 import Hero from "@/components/layout/Hero";
 import HomeMenu from "@/components/layout/HomeMenu";
 import SectionHeaders from "@/components/layout/SectionHeaders";
@@ -102,16 +102,14 @@ console.log('accessToken перед отправкой:', session?.accessToken);
         <div className="mt-2">
           <a href="https://maps.app.goo.gl/GQ5jHkTBXVvaJ8Hw5" className="text-2xl text-gray-500">Varsti Avatud: Suur-Karja tn 11</a>
         </div>
-        <div className="max-h-auto max-h-25 block mx-auto flex">
-          <iframe
-            className="max-h-auto max-h-25 block mx-auto flex"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2028.721310167819!2d24.742489877931824!3d59.43772247466704!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x469293f2ddec595f%3A0xd52d81a807bc04df!2sNaiChai%20Bubble%20Tea%20Bar!5e0!3m2!1sru!2see!4v1712001791589!5m2!1sru!2see"
-            width="300"
-            height="400"
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          />
-        </div>
+  <div className="mt-8 max-w-md mx-auto">
+<GoogleMap 
+  lat={59.435613} 
+  lng={24.7467445} 
+  zoom={17}
+/>
+
+  </div>
       </section>
     </>
   );

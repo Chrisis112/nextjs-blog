@@ -13,6 +13,7 @@ export default function RootLayout({ children }) {
     <html lang="et">
       <body className={roboto.className}>
         {/* i18n только для клиентских компонентов */}
+
         <AppProvider>
           <main className="max-w-4xl mx-auto p-2 pt-20 min-h-screen flex flex-col gap-2">
             <Toaster />
