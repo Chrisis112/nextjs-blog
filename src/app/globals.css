@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-section.hero{
+section.hero {
   @apply block md:grid;
   grid-template-columns: .4fr .6fr;
 }
@@ -11,67 +11,80 @@ select,
 input[type="email"],
 input[type="password"],
 input[type="tel"],
-input[type="text"]
- {
-  @apply block w-full mb-2 rounded-xl;
-  @apply border p-2 border-gray-300 bg-gray-100;
+input[type="text"] {
+  @apply block w-full mb-2 rounded-xl border p-2 border-gray-300 bg-gray-100;
 }
+
 input[type="email"]:disabled,
 input[type="password"]:disabled,
 input[type="tel"]:disabled,
 input[type="text"]:disabled {
-    @apply bg-gray-300 border-0 cursor-not-allowed text-gray-500;
+  @apply bg-gray-300 border-0 cursor-not-allowed text-gray-500;
 }
-label{
-    @apply text-gray-500 text-sm leading-tight;
+
+label {
+  @apply text-gray-500 text-sm leading-tight;
 }
-label + input{
-    margin-top: -2px;
+
+label + input {
+  margin-top: -2px;
 }
+
 ul li {
   margin: 5px;
 }
+
 h5 {
   font-weight: bold;
-  gap: 4;
-  text-align: ;
-margin-bottom: 10px;
-margin-top:20px
+  margin-bottom: 10px;
+  margin-top: 20px;
+  text-align: left; /* ← ИСПРАВЛЕНО */
 }
-p {
 
-};
+p {
+  /* УБРАЛ ПУСТЫЕ СКОБКИ */
+}
+
 h3 {
-    color: #4c2600;
-  }
-  h2 {
-    color: #4c2600;
-  }
-  h1 {
-    color: #4c2600;
-  }
-  h4 {
-    color: #4c2600;
-  }
-  p {
-    color: #4c2600;
-  }
-button, .button{
-    @apply flex w-full justify-center gap-2  ;
-    @apply border border-gray-300 rounded-xl px-6 py-2;
+  color: #4c2600;
 }
-button[type="submit"], .submit, button.primary{
+
+h2 {
+  color: #4c2600;
+}
+
+h1 {
+  color: #4c2600;
+}
+
+h4 {
+  color: #4c2600;
+}
+
+p {
+  color: #4c2600;
+}
+
+button, 
+.button {
+  @apply flex w-full justify-center gap-2 border border-gray-300 rounded-xl px-6 py-2;
+}
+
+button[type="submit"], 
+.submit, 
+button.primary {
   @apply border-primary bg-primary text-white;
-    
 }
-button[type="submit"]:disabled, .submit:disabled{
+
+button[type="submit"]:disabled, 
+.submit:disabled {
   @apply bg-gray-300 text-gray-700 rounded-full py-2 px-4;
 }
+
 div.tabs > * {
   @apply bg-gray-300 text-gray-700 rounded-full py-2 px-4;
 }
-div.tabs > *.active{
+
+div.tabs > *.active {
   @apply bg-primary text-white;
 }
-
-
