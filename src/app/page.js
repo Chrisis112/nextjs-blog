@@ -100,7 +100,7 @@ console.log('accessToken перед отправкой:', session?.accessToken);
           </div>
         </div>
         <div className="mt-2">
-          <a href="https://maps.app.goo.gl/GQ5jHkTBXVvaJ8Hw5" className="text-2xl text-gray-500">Mündi 3</a>
+          <a href="https://maps.app.goo.gl/GQ5jHkTBXVvaJ8Hw5" className="text-2xl text-gray-500">Varsti Avatud: Suur-Karja tn 11</a>
         </div>
         <div className="max-h-auto max-h-25 block mx-auto flex">
           <iframe
