@@ -1,8 +1,9 @@
+/* 
 import AddToCartButton from "@/components/menu/AddToCartButton";
 import Image from "next/image";
 import { useTranslation } from "react-i18next";
-
-export default function MenuItemTile({ onAddToCart, ...item }) {
+/* 
+port default function MenuItemTile({ onAddToCart, ...item }) {
   const { i18n } = useTranslation();
 
   const {
@@ -39,6 +40,8 @@ export default function MenuItemTile({ onAddToCart, ...item }) {
   }
 
   return (
+
+   
     <div
       className="bg-gray-200 p-4 rounded-lg text-center group hover:bg-white hover:shadow-md hover:shadow-black/25 transition-all flex flex-col justify-between mx-auto"
       style={{
@@ -49,7 +52,8 @@ export default function MenuItemTile({ onAddToCart, ...item }) {
         boxSizing: "border-box",
       }}
     >
-      {/* Верхний контент */}
+      
+
       <div className="flex flex-col items-center">
         <div
           className="mx-auto mb-3"
@@ -61,6 +65,7 @@ export default function MenuItemTile({ onAddToCart, ...item }) {
             overflow: "hidden"
           }}
         >
+
           <Image
             src={image || "/default-image.png"}
             alt={getLocalizedText(name)}
@@ -117,7 +122,7 @@ export default function MenuItemTile({ onAddToCart, ...item }) {
         </p>
       </div>
 
-      {/* Кнопка внизу */}
+
       <div className="mt-auto">
         <AddToCartButton
           image={image}
@@ -128,5 +133,7 @@ export default function MenuItemTile({ onAddToCart, ...item }) {
         />
       </div>
     </div>
+  
   );
 }
+  */

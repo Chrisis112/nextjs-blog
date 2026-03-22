@@ -1,3 +1,4 @@
+/* 
 import { CartContext } from "@/components/AppContext";
 import MenuItemTile from "@/components/menu/MenuItemTile";
 import Image from "next/legacy/image";
@@ -119,7 +120,7 @@ addToCart(
               <h2 className="text-lg font-bold text-center mb-2">{getLocalizedText(name)}</h2>
               <p className="text-center text-gray-500 text-sm mb-2">{getLocalizedText(description)}</p>
 
-              {/* Выбор локации */}
+
               {locations?.length > 0 && (
                 <div className="mb-3 w-full">
                   <label className="block text-gray-700 font-medium text-sm mb-1">
@@ -137,7 +138,7 @@ addToCart(
                 </div>
               )}
 
-              {/* Остальной интерфейс опций (размер, температура, допы) */}
+
               {sizes?.length > 0 && (
                 <div className="py-2 w-full">
                   <h3 className="text-center text-gray-700 mb-1">{t('menuItem.pickSize')}</h3>
@@ -224,3 +225,4 @@ addToCart(
     </>
   );
 }
+  */

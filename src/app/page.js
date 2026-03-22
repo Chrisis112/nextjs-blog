@@ -78,12 +78,12 @@ console.log('accessToken перед отправкой:', session?.accessToken);
       </div>
       <TrendingSlider/>
       <Hero />
-      <HomeMenu />
+      {/*<HomeMenu /> */}
       <section className="text-center mt-10" id="about">
         <SectionHeaders subHeader={t('about.subHeader')} mainHeader={t('about.mainHeader')} />
         <div className="text-gray-500 max-w-md mx-auto mt-4 flex flex-col gap-4">
           <p>{t('about.paragraph1')}</p>
-          <p>{t('about.paragraph2')}</p>
+         <p>{t('about.paragraph2')}</p>
           <p>{t('about.paragraph3')}</p>
         </div>
         <br/>

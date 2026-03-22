@@ -167,7 +167,7 @@ return (
           {/* // LanguageSwitcher в меню по желанию */}
           <div className="flex items-center justify-center" />
           <Link href={'/'}>{t('nav.home')}</Link>
-          <Link href={'/menu'}>{t('nav.menu')}</Link>
+        {/*   <Link href={'/menu'}>{t('nav.menu')}</Link>*/} 
           <Link href={'/#about'}>{t('nav.about')}</Link>
           <Link href={'/#contact'}>{t('nav.contact')}</Link>
           <AuthLinks status={status} userName={userName} />
@@ -180,7 +180,7 @@ return (
             <Image src={'/logo123.png'} width={50} height={50} alt={'logo'} />
           </Link>
           <Link href={'/'}>{t('nav.home')}</Link>
-          <Link href={'/menu'}>{t('nav.menu')}</Link>
+                  {/*   <Link href={'/menu'}>{t('nav.menu')}</Link>*/} 
           <Link href={'/#about'}>{t('nav.about')}</Link>
           <Link href={'/#contact'}>{t('nav.contact')}</Link>
         </nav>

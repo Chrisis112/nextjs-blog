@@ -1,3 +1,13 @@
+ export default function MenuPage() {
+  return (
+    <main>
+      <h1></h1>
+    </main>
+  );
+}
+ 
+ /*
+
 'use client';
 
 import SectionHeaders from "@/components/layout/SectionHeaders";
@@ -126,3 +136,4 @@ export default function MenuPage() {
     </>
   );
 }
+  */
