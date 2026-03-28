@@ -1,4 +1,4 @@
-/*
+
 'use client';
 import SectionHeaders from "@/components/layout/SectionHeaders";
 import MenuItem from "@/components/menu/MenuItem";
@@ -36,4 +36,3 @@ export default function HomeMenu() {
     </section>
   );
 }
- */

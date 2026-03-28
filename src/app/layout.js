@@ -10,7 +10,7 @@ const roboto = Comfortaa({ subsets: ['latin'], weight: ['400', '500', '700'] });
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="et">
+    <html lang="en">
       <body className={roboto.className}>
         {/* i18n только для клиентских компонентов */}
 

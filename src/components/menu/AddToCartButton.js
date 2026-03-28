@@ -1,4 +1,4 @@
-  /* 
+
 import { useTranslation } from 'react-i18next';
 
 export default function AddToCartButton({ hasSizesOrExtras, onClick, basePrice, image }) {
@@ -29,4 +29,3 @@ export default function AddToCartButton({ hasSizesOrExtras, onClick, basePrice, 
     </button>
   );
 }
-  */

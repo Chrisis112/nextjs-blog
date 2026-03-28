@@ -1,3 +1,4 @@
+/*
 import mongoose from 'mongoose';
 import { MenuItem } from '@/models/MenuItem';
 
@@ -18,6 +19,62 @@ export async function GET(request, { params }) {
   }
 
   return new Response(JSON.stringify(item), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+*/
+import mongoose from 'mongoose';
+import { MenuItem } from '@/models/MenuItem';
+
+// GET /api/menu-items/[id]
+export async function GET(request, { params }) {
+  if (mongoose.connection.readyState !== 1) {
+    await mongoose.connect(process.env.MONGO_URL);
+  }
+
+  const { id } = await params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return new Response('Invalid ID', { status: 400 });
+  }
+
+  const item = await MenuItem.findById(id);
+  if (!item) {
+    return new Response('Not Found', { status: 404 });
+  }
+
+  return new Response(JSON.stringify(item), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+export async function DELETE(request, { params }) {
+  if (mongoose.connection.readyState !== 1) {
+    await mongoose.connect(process.env.MONGO_URL);
+  }
+
+  const { id } = await params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return new Response('Invalid ID', { status: 400 });
+  }
+
+  await MenuItem.deleteOne({ _id: id });
+  return new Response(null, { status: 204 });
+}
+
+// PUT /api/menu-items (для сохранения изменений)
+export async function PUT(req) {
+  if (mongoose.connection.readyState !== 1) {
+    await mongoose.connect(process.env.MONGO_URL);
+  }
+
+  const { _id, ...dataRaw } = await req.json();
+  const data = { ...dataRaw }; // здесь mongoose сам нормализует schema
+
+  await MenuItem.findByIdAndUpdate(_id, data);
+  return new Response(JSON.stringify(true), {
     status: 200,
     headers: { 'Content-Type': 'application/json' },
   });
