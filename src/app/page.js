@@ -78,7 +78,7 @@ console.log('accessToken перед отправкой:', session?.accessToken);
       </div>
       <TrendingSlider/>
       <Hero />
-      <HomeMenu /> 
+      {/*<HomeMenu /> */}
       <section className="text-center mt-10" id="about">
         <SectionHeaders subHeader={t('about.subHeader')} mainHeader={t('about.mainHeader')} />
         <div className="text-gray-500 max-w-md mx-auto mt-4 flex flex-col gap-4">
@@ -94,13 +94,15 @@ console.log('accessToken перед отправкой:', session?.accessToken);
         <div className="mt-2 text-2xl text-gray-500">{t('contact.companyName')}</div>
         <div className="mt-2 text-2xl text-gray-500">{t('contact.vat')}</div>
         <div className="mt-4">
-          <a href="tel:+37256650230" className="text-2xl underline text-gray-500">+372 5665 0230</a>
           <div className="mt-2">
             <a href="mailto:info@naichai.ee" className="text-2xl underline text-gray-500">info@naichai.ee</a>
           </div>
         </div>
         <div className="mt-2">
-          <a href="https://maps.app.goo.gl/GQ5jHkTBXVvaJ8Hw5" className="text-2xl text-gray-500">Avatud: Suur-Karja tn 11</a>
+          <a href="https://maps.app.goo.gl/GQ5jHkTBXVvaJ8Hw5" className="text-2xl text-gray-500"> Suur-Karja tn 11, Tallinn</a>
+                  <div className="mt-2">
+                    <a href="https://maps.app.goo.gl/GQ5jHkTBXVvaJ8Hw5" className="text-2xl text-gray-500"> Stroomi keskus, Tallinn</a>
+        </div>
         </div>
   <div className="mt-8 max-w-md mx-auto">
 {/*<GoogleMap 
