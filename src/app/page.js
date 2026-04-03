@@ -99,9 +99,9 @@ console.log('accessToken перед отправкой:', session?.accessToken);
           </div>
         </div>
         <div className="mt-2">
-          <a href="https://maps.app.goo.gl/GQ5jHkTBXVvaJ8Hw5" className="text-2xl text-gray-500"> Suur-Karja tn 11, Tallinn</a>
+          <a href="https://maps.app.goo.gl/GQ5jHkTBXVvaJ8Hw5" className="text-2xl text-gray-500"> Suur-Karja tn 11, Vanalinn, Tallinn, </a>
                   <div className="mt-2">
-                    <a href="https://maps.app.goo.gl/GQ5jHkTBXVvaJ8Hw5" className="text-2xl text-gray-500"> Stroomi keskus, Tallinn</a>
+                    <a href="https://maps.app.goo.gl/GQ5jHkTBXVvaJ8Hw5" className="text-2xl text-gray-500"> Stroomi keskus, Põhja-Tallinn, Tallinn</a>
         </div>
         </div>
   <div className="mt-8 max-w-md mx-auto">
