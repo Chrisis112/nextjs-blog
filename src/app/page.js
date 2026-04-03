@@ -105,12 +105,12 @@ console.log('accessToken перед отправкой:', session?.accessToken);
         </div>
         </div>
   <div className="mt-8 max-w-md mx-auto">
-{/*<GoogleMap 
+<GoogleMap 
   lat={59.4355418} 
   lng={24.7465335} 
   zoom={17}
 />
-*/}
+
   </div>
       </section>
     </>
