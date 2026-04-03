@@ -311,7 +311,7 @@ export default function MenuItemTile({ onAddToCart, ...item }) {
       <div
         className="w-full mx-auto mb-3"
         style={{
-          minHeight: "400px",  // высота контейнера
+          minHeight: "700px",  // высота контейнера
           position: "relative",
           borderRadius: "8px",
           overflow: "hidden",
