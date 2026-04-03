@@ -237,7 +237,7 @@ export default function MenuPage() {
       )}
 
       {!modalVisible && (
-        <section className="mt-8 space-y-12">
+        <section className="">
           {categories.map((c) => {
             // Категории без блюд — просто картинки
             const itemsFilteredByCategoryAndLocation = menuItems
@@ -256,7 +256,7 @@ export default function MenuPage() {
                   <SectionHeaders mainHeader={getCategoryName(c.name)} />
                 </div>
                 <div
-                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center"
+                  className="grid grid-cols-1  lg:grid-cols-3  justify-items-center"
                   style={{ alignItems: "stretch" }}
                 >
                   {/* Показываем только по одной картинке категории или все, как хочешь */}

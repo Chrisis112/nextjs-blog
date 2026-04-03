@@ -299,7 +299,7 @@ export default function MenuItemTile({ onAddToCart, ...item }) {
 
   return (
     <div
-      className="p-4 rounded-lg flex flex-col justify-between mx-auto"
+      className=" rounded-lg flex flex-col justify-between mx-auto"
       style={{
         width: "100%",
         maxWidth: "400px",
@@ -309,11 +309,11 @@ export default function MenuItemTile({ onAddToCart, ...item }) {
     >
       {/* Контейнер под картинку меню */}
       <div
-        className="w-full mx-auto mb-3"
+        className="w-full mx-auto mb-1"
         style={{
           minHeight: "700px",  // высота контейнера
           position: "relative",
-          borderRadius: "8px",
+          borderRadius: "1px",
           overflow: "hidden",
         }}
       >
